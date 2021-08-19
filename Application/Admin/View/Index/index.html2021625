@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <!-- Bootstrap 核心 CSS 文件 -->
+        <link rel="stylesheet" href="__PUBLIC__/bootstrap/css/bootstrap.min.css"/>
+        <!-- 自定义css样式表 -->
+        <block name="css"></block>
+        <!-- admin CSS 文件 -->
+        <link rel="stylesheet" href="__PUBLIC__/css/base.css?v=20180125"/>
+        <link rel="stylesheet" href="__PUBLIC__/css/admin.css?v=20180228"/>
+        <title>
+            餐饮店云管理
+        </title>
+    </head>
+    <body class="index-body">
+        <div id="lang-content" class="h100" v-cloak>
+            <header class="admin-header">
+                <div class="admin-header-content clearfix">
+                    <!--<img class="header-logo" src="{$logo}">-->
+                    <!--<img class="header-logo" src="{$Restaurant['logo']}">-->
+                    <if condition="$logo != ''">
+                    	<img class="header-logo" src="{$logo}"/>
+                    	<else />
+                    	<img class="header-logo" src="__PUBLIC__/images/logos.png">
+                    </if>
+                    <span class="header-title">
+                        {{ langData.headerTitle[lang] }}
+                    </span>
+                    <div class="pull-right header-user flex-content">
+                        <div id="account" class="header-user-name flex-main">
+                            <div>
+                                {$Think.session.login_account}
+                            </div>
+                            <div>
+                                <?php echo $_SESSION['restaurant_name'];?>
+                            </div>
+                        </div>
+                        <button class="header-logout" onclick="loginout()">
+                            {{ langData.signOut[lang] }}
+                        </button>
+                        <div class="dropdown">
+                            <button type="button" class="dropdown-toggle" data-toggle="dropdown">
+                                {{ langData.language[lang] }}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a onclick="setCookie('zh-CN')">
+                                        中文简体
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="setCookie('zh-TW')">
+                                        中文繁體
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="setCookie('en')">
+                                        English
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="main">
+                <!-- 左侧导航栏 -->
+                <aside class="sidebar">
+                    <ul class="sidebar-menu">
+                        <li class="treeview">
+                            <if condition="in_array('Admin/Restaurant/all',$url)">
+                            <div class="treeview-header treeview-item" data-auth="a_0">
+                                <img src="__PUBLIC__/images/store.png"/>
+                                <span>
+                                    {{ langData.shopSet[lang] }}
+                                </span>
+                            </div>
+
+                            <ul class="treeview-menu">
+                                <if condition="in_array('Admin/RestaurantSetting/index',$url)">
+                                    <li class="treeview-item active" data-auth="a_1">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/index')}" >
+                                            {{ langData.shopInfo[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <!--<li class="treeview-item active" data-auth="a_1">-->
+                                    <!--<a target='rightFrame' href="{:U('Restaurant/index')}">-->
+                                        <!--{{ langData.shopInfo[lang] }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <if condition="in_array('Admin/Moudle/index',$url)">
+                                    <li class="treeview-item" data-auth="a_2">
+                                        <a target='rightFrame' href="{:U('Moudle/index')}">
+                                            {{ langData.selfServiceDeviceSet[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <!--<li class="treeview-item" id="nav_receipt" data-auth="a_3">-->
+                                    <!--<a target='rightFrame' href="{:U('Restaurant/receipt')}">-->
+                                        <!--{{ langData.billSet[lang] }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <if condition="in_array('Admin/RestaurantSetting/receipt',$url)">
+                                    <li class="treeview-item" id="nav_receipt" data-auth="a_3">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/receipt')}">
+                                            {{ langData.billSet[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <if condition="in_array('Admin/RestaurantSetting/dataForPay',$url)">
+                                    <li class="treeview-item" data-auth="a_4">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/dataForPay')}">
+                                            {{ langData.paymentSet[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <!--<li class="treeview-item" data-auth="a_5">-->
+                                    <!--<a target='rightFrame' href="{:U('Accounts/index')}">-->
+                                        <!--{{ langData.roleAccount[lang] }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <!--<if condition="in_array('Admin/RestaurantSetting/permission',$url)">-->
+                                    <!--<li class="treeview-item" data-auth="a_6">-->
+                                        <!--<a target='rightFrame' href="{:U('RestaurantSetting/permission')}">-->
+                                            <!--{{ langData.adminManagement[lang] }}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                <!--</if>-->
+                                <if condition="in_array('Admin/RestaurantSetting/device',$url)">
+                                    <li class="treeview-item" data-auth="a_7">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/device')}">
+                                            {{ langData.equipment[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <!--<li class="treeview-item" data-auth="a_8">-->
+                                    <!--<a target='rightFrame' href="{:U('Index/upload')}">-->
+                                        <!--{{ langData.importExport[lang] }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <!--<li class="treeview-item" data-auth="a_9">-->
+                                <!--<a target='rightFrame' href="{:U('ChenSen/index')}">-->
+                                    <!--{{ langData.happyMount[lang] }}-->
+                                <!--</a>-->
+                                <!--</li>-->
+                                <!--<if condition="in_array('Admin/RestaurantSetting/chenSen',$url)">
+                                    <li class="treeview-item" data-auth="a_9">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/chenSen')}">
+                                            {{ langData.happyMount[lang] }}
+                                        </a>
+                                    </li>
+                                </if>-->
+                                <!--<li class="treeview-item" data-auth="a_10">-->
+                                    <!--<a target='rightFrame' href="{:U('Restaurant/packing')}">-->
+                                        <!--{{ langData.PackingSet[lang] }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <if condition="in_array('Admin/RestaurantSetting/member',$url)">
+                                    <li class="treeview-item" data-auth="a_9">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/member')}">
+                                            {{ langData.memberSettings[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+
+                                <if condition="in_array('Admin/RestaurantSetting/baiduConfig',$url)">
+                                    <li class="treeview-item" data-auth="a_11">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/baiduConfig')}">
+                                            百度菜品识别
+                                        </a>
+                                    </li>
+                                </if>
+
+                                <if condition="in_array('Admin/RestaurantSetting/openPlatformConfig',$url)">
+                                    <li class="treeview-item" data-auth="a_11">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/openPlatformConfig')}">
+                                            开放平台
+                                        </a>
+                                    </li>
+                                </if>
+
+                            </ul>
+                         </if>
+
+                        </li>
+
+                        <if condition="in_array('Admin/admin/role',$url)">
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="a_0">
+                                <img src="__PUBLIC__/images/store.png"/>
+                                <span>
+                                	{{langData.AdministratorInfo[lang]}}
+                                </span>
+                            </div>
+                            <ul class="treeview-menu">
+                                <if condition="in_array('Admin/Accounts/role',$url)">
+                                    <li class="treeview-item" data-auth="a_7">
+                                        <a target='rightFrame' href="{:U('Accounts/role')}">
+                                        	{{langData.RoleManagement[lang]}}
+                                        </a>
+                                    </li>
+                                </if>
+                                <!--</li>-->
+                                <if condition="in_array('Admin/Accounts/account',$url)">
+                                    <li class="treeview-item" data-auth="a_9">
+                                        <a target='rightFrame' href="{:U('Accounts/account')}">
+                                        	{{langData.AccountManagement[lang]}}
+                                        </a>
+                                    </li>
+                                </if>
+                            </ul>
+                        </li>
+                        </if>
+
+
+
+
+
+
+                        <if condition="in_array('Admin/Dishes/index',$url)">
+                            <li class="treeview">
+
+                                <div class="treeview-header treeview-item" data-auth="b_0">
+                                    <a target='rightFrame' href="{:U('Dishes/index')}">
+                                        <img src="__PUBLIC__/images/dishes.png"/>
+                                        <span>
+                                            {{ langData.disheSet[lang] }}
+                                        </span>
+                                    </a>
+                                </div>
+                            </li>
+                        </if>
+                        <if condition="in_array('Admin/UploadFood/index',$url)">
+                            <li class="treeview">
+                                <div class="treeview-header treeview-item" data-auth="b_0">
+                                    <a target='rightFrame' href="{:U('UploadFood/index')}">
+                                        <img src="__PUBLIC__/images/dishes.png"/>
+                                        <span>
+                                        	{{ langData.UpdateMenu[lang] }}
+                                        </span>
+                                    </a>
+                                </div>
+                            </li>
+                        </if>
+                        <if condition="$is_en">
+                            <if condition="in_array('Admin/Category/index',$url)">
+                                <li class="treeview">
+                                    <div class="treeview-header treeview-item" data-auth="c_0">
+                                        <a target='rightFrame' href="{:U('Category/index')}">
+                                            <img src="__PUBLIC__/images/dishes.png"/>
+                                            <span>
+                                                {{ langData.timeClassify[lang] }}
+                                            </span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </if>
+                        </if>
+
+
+
+
+                        <li class="treeview">
+                            <if condition="in_array('Admin/Hui/index',$url)">
+                                <div class="treeview-header treeview-item" data-auth="d_0">
+                                    <img src="__PUBLIC__/images/data.png"/>
+                                    <span>
+                                    {{ langData.officialAccount[lang] }}
+                                </span>
+                                </div>
+                                <ul class="treeview-menu">
+                                    <if condition="in_array('Admin/Wechat/index',$url)">
+                                        <li class="treeview-item" data-auth="d_1">
+                                            <a target='rightFrame' href="{:U('Wechat/index')}">
+                                                {{ langData.officialAccountSet[lang] }}
+                                            </a>
+                                        </li>
+                                    </if>
+                                    <if condition="in_array('Admin/Wechat/menu',$url)">
+                                        <li class="treeview-item" data-auth="d_1">
+                                            <a target='rightFrame' href="{:U('Wechat/menu')}">
+                                                {{ langData.customizeMenus[lang] }}
+                                            </a>
+                                        </li>
+                                    </if>
+                                </ul>
+                            </if>
+                        </li>
+
+
+
+                        <li class="treeview">
+                            <if condition="in_array('Admin/data/index',$url)">
+                            <div class="treeview-header treeview-item" data-auth="d_0">
+                                <img src="__PUBLIC__/images/data.png"/>
+                                <span>
+                                    {{ langData.statistics_title[lang] }}
+                                </span>
+                            </div>
+                            <ul class="treeview-menu">
+                                <if condition="in_array('Admin/Sale/food_chart',$url)">
+                                    <li class="treeview-item" data-auth="d_1">
+                                        <a target='rightFrame' href="{:U('Sale/food_chart')}">
+                                            {{ langData.foodSales[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <if condition="in_array('Admin/Sale/index',$url)">
+                                    <li class="treeview-item" data-auth="d_2">
+                                        <a target='rightFrame' href="{:U('Sale/index')}">
+                                            {{ langData.detailEnquiry[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <if condition="in_array('Admin/Sale/year',$url)">
+                                    <li class="treeview-item" id="nav_year_month" data-auth="d_3">
+                                        <a target='rightFrame' href="{:U('Sale/year')}">
+                                            {{ langData.yearlyReport[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <!--<li class="treeview-item" id="nav_waimai" data-auth="d_4">-->
+                                    <!--<a target='rightFrame' href="{:U('Sale/meituan')}">-->
+                                        <!--{{ langData.takeOutReport[lang] }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+
+
+                                <if condition="in_array('Admin/Express/index',$url)">
+                                    <if condition="$express_delivery neq null">
+                                        <li class="treeview-item" data-auth="d_5">
+                                            <a target='rightFrame' href="{:U('Express/index')}">
+                                                {{ langData.logisticsStatistics[lang] }}
+                                            </a>
+                                        </li>
+                                    </if>
+                                </if>
+                            </ul>
+                            </if>
+                        </li>
+
+                        <!-- 外卖管理 -->
+                        <!--<li class="treeview">-->
+                            <!--<div class="treeview-header treeview-item">-->
+                                <!--<a target='rightFrame' href="{:U('Takeaway/index')}">-->
+                                    <!--<img src="__PUBLIC__/images/dishes.png">-->
+                                    <!--<span>外卖管理</span>-->
+                                <!--</a>-->
+                            <!--</div>-->
+                        <!--</li>-->
+                        <!-- 小程序授权 -->
+                        <!--<li class="treeview">-->
+                            <!--<div class="treeview-header treeview-item">-->
+                                <!--<a target='rightFrame' href="{:U('WechatApplet/index')}">-->
+                                    <!--<img src="__PUBLIC__/images/dishes.png">-->
+                                    <!--<span>小程序</span>-->
+                                <!--</a>-->
+                            <!--</div>-->
+                        <!--</li>-->
+
+                        <!-- 判断是否要显示-->
+                        <!--<php-->
+                            <!--if($type == 0) echo '-->
+                            <!--<li class="treeview">-->
+                                <!--<div class="treeview-header treeview-item" data-auth="e_0">-->
+                                    <!--<img src="__PUBLIC__/images/data.png"/>-->
+                                    <!--<span>-->
+                                        <!--{{ langData.officialAccount[lang] }}-->
+                                    <!--</span>-->
+                                <!--</div>-->
+                                <!--<ul class="treeview-menu">-->
+                                    <!--<li class="treeview-item" data-auth="e_1">-->
+                                        <!--<a target="rightFrame" href="/index.php/Admin/Wechat/index">-->
+                                            <!--{{ langData.officialAccountSet[lang] }}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                    <!--<li class="treeview-item" data-auth="e_2">-->
+                                        <!--<a target="rightFrame" href="/index.php/Admin/Wechat/menu">-->
+                                            <!--{{ langData.customizeMenus[lang] }}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--'-->
+                        <!--</php-->
+                        <!--<li class="treeview">-->
+                            <!--<div class="treeview-header treeview-item" data-auth="f_0">-->
+                                <!--<a target='rightFrame' href="{:U('DataDock/meituanTest')}">-->
+                                    <!--<img src="__PUBLIC__/images/connector.png"/>-->
+                                    <!--<span>-->
+                                        <!--{{ langData.takeOutDocking[lang] }}-->
+                                    <!--</span>-->
+                                <!--</a>-->
+                            <!--</div>-->
+                        <!--</li>-->
+                        <!--<if condition="in_array('Admin/member/index',$url)">
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="g_0">
+                                <img src="__PUBLIC__/images/member.png"/>
+                                <span>
+                                    {{ langData.member[lang] }}
+                                </span>
+                            </div>
+                            <ul class="treeview-menu">
+                                <if condition="in_array('Admin/Member/setting',$url)">
+                                    <li class="treeview-item" data-auth="g_1">
+                                        <a target='rightFrame' href="{:U('Member/setting')}">
+                                            {{ langData.memberSettings[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <if condition="in_array('Admin/Member/point_consumptio',$url)">
+                                    <li class="treeview-item" data-auth="g_2">
+                                        <a target='rightFrame' href="{:U('Member/point_consumptio')}">
+                                            {{ langData.consumptionPoints[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <if condition="in_array('Admin/Member/vip_advertisement',$url)">
+                                    <li class="treeview-item" data-auth="g_3">
+                                        <a target='rightFrame' href="{:U('Member/vip_advertisement')}">
+                                            {{ langData.memberAdvertising[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                            </ul>
+                        </li>
+                        </if>-->
+                        <!--<li class="treeview">-->
+                            <!--<div class="treeview-header treeview-item" data-auth="h_0">-->
+                                <!--<a target='rightFrame' href="{:U('billBoard/index')}">-->
+                                    <!--<img src="__PUBLIC__/images/menu.png"/>-->
+                                    <!--<span>-->
+                                        <!--{{ langData.electronicMenu[lang] }}-->
+                                    <!--</span>-->
+                                <!--</a>-->
+                            <!--</div>-->
+                        <!--</li>-->
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="i_0">
+                                <a target='rightFrame' href="{:U('device/show_num_device')}">
+                                    <img src="__PUBLIC__/images/device.png"/>
+                                    <span>
+                                        {{ langData.callNumberDevice[lang] }}
+                                    </span>
+                                </a>
+                            </div>
+                        </li>
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="j_0">
+                                <a target='rightFrame' href="{:U('OrderSet/setTimes')}">
+                                    <img src="__PUBLIC__/images/time.png"/>
+                                    <span>
+                                        {{ langData.booking[lang] }}
+                                    </span>
+                                </a>
+                            </div>
+                        </li>
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="k_0">
+                                <a target='rightFrame' href="{:U('Device/deskInfo')}">
+                                    <img src="__PUBLIC__/images/code.png"/>
+                                    <span>
+                                        {{ langData.scanToOrder[lang] }}
+                                    </span>
+                                </a>
+                            </div>
+                        </li>
+
+                        <if condition="in_array('Admin/Activity/all',$url)">
+                            <li class="treeview">
+                                <div class="treeview-header treeview-item" data-auth="a_0">
+                                    <img src="__PUBLIC__/images/store.png"/>
+                                    <span>营销活动</span>
+                                </div>
+                                <ul class="treeview-menu">
+                                    <if condition="in_array('Admin/Activity/index',$url)">
+                                        <li class="treeview-item" data-auth="a_7">
+                                            <a target='rightFrame' href="{:U('activity/index')}">活动设置</a>
+                                        </li>
+                                    </if>
+                                </ul>
+                            </li>
+                        </if>
+                        <if condition="in_array('Admin/Memberlist/index',$url)">
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="a_0">
+                                <img src="__PUBLIC__/images/store.png"/>
+                                <span>{{langData.memberCentre[lang]}}</span>
+                            </div>
+                            <ul class="treeview-menu">
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/vip')}">{{langData.memberInfo[lang]}}</a>
+                                </li>
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/prepaidOrder')}">{{langData.rechargeOrder[lang]}}</a>
+                                </li>
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/prepaid')}">{{langData.preRecharge[lang]}}</a>
+                                </li>
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/weixinAccounts')}">公众号设置</a>
+                                </li>
+                            </ul>
+                        </li>
+                        </if>
+                        <!--<if condition="$likeOpen == 1">-->
+                            <!--<li class="treeview">-->
+                                <!--<div class="treeview-header treeview-item" data-auth="l_0">-->
+                                    <!--<img src="__PUBLIC__/images/store.png"/>-->
+                                    <!--<span>-->
+                                      <!--{{langData.LikeFunction[lang]}}-->
+                                    <!--</span>-->
+                                <!--</div>-->
+                                <!--<ul class="treeview-menu">-->
+                                    <!--<li class="treeview-item active" data-auth="l_1">-->
+                                        <!--<a target='rightFrame' href="{:U('Menu/menu')}">-->
+                                            <!--{{langData.dishesSet[lang]}}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                    <!--<li class="treeview-item" data-auth="l_2">-->
+                                        <!--<a target='rightFrame' href="{:U('Like/likeCount')}">-->
+                                            <!--{{langData.LikeStatistics[lang]}}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                        <!--</if>-->
+                    </ul>
+                </aside>
+                <iframe src="{:U('RestaurantSetting/index')}" class="main-iframe" id="rightFrame" name="rightFrame"></iframe>
+            </div>
+        </div>
+        <script src="__PUBLIC__/js/vue.js"></script>
+        <script src="__PUBLIC__/language.json?v=20210622"></script>
+        <script src="__PUBLIC__/js/jquery-3.1.0.min.js"></script>
+        <script src="__PUBLIC__/bootstrap/js/bootstrap.min.js"></script>
+        <script src="__PUBLIC__/layer/layer.js"></script>
+        <script src="__PUBLIC__/js/Admin/common.js"></script>
+        <script type="text/javascript">
+        var vm = new Vue({
+            el: "#lang-content",
+            data: {
+                lang: language,
+                langData: langData
+            }
+        })
+
+        function submit_form() {
+            var password = $("input[name='password']").val();
+            var passwords = $("input[name='passwords']").val();
+            if (password === passwords) {
+                var form = $("#restaurant_form")[0];
+                var formData = new FormData(form);
+                $.ajax({
+                    //1
+                    url: "/index.php/admin/restaurant/index",
+                    data: formData,
+                    dataType: 'json',
+                    type: 'post',
+                    //          async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(msg) {
+                        if (msg.code == 1) {
+                            layer.msg(vm.langData.success[vm.lang]);
+                        } else {
+                            layer.msg(vm.langData.failed[vm.lang]);
+                        }
+                    },
+                    error: function() {
+                        layer.msg(vm.langData.networkError[vm.lang]);
+                    }
+                });
+            } else {
+                layer.msg(vm.langData.psdMatch[vm.lang]);
+            }
+        }
+        </script>
+
+        <script>
+            var auth = '{$permission}';
+
+            $(".treeview-item").each(function(){
+                if(auth.is_main == 1){
+                    if(auth.permission.indexOf($(this).attr("data-auth"))<0){
+                        $(this).remove();
+                    }
+                }
+            })
+
+        </script>
+    </body>
+</html>

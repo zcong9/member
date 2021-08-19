@@ -1,0 +1,55 @@
+<style>
+	.table th, .table td {
+		text-align: center;
+		vertical-align: middle!important;
+	}
+</style>
+<table id="tableList" class="table table-hover">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>商户名称</th>
+    <th>门店名称</th>
+    <th>门店地址</th>
+    <th>时间</th>
+    <th>状态</th>
+    <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<volist name="lists" id="vo">
+    <tr id="trid{$vo.store_id}">
+        <td>{$vo.store_id}</td>
+        <td>{$vo.merchant_name}</td>
+        <td>{$vo.store_name}</td>
+        <td>{$vo.store_addr}</td>
+        <td>{$vo.create_at|date="Y-m-d H:i:s",###}</td>
+        <td>
+            <div class="checkbox-switch">
+                <input type="checkbox" value="{$vo.status}" data-id="{$vo.store_id}" <if condition="$vo['status'] eq '1'">checked</if> onchange="switchFun(this)">
+                <label></label>
+            </div>
+        </td>
+        <td><a class="btn btn-info btn-sm editPopup" data-url="{:U('edit',['id'=>$vo['store_id']])}" data-id="{$vo.store_id}" data-title="编辑-{$vo.store_name}">编辑</a></td>
+    </tr>
+</volist>
+</tbody>
+</table>
+<div>
+<ul class="pagination" id="detail-page">
+    {$page}
+</ul>
+</div>
+<block name="js">
+	<script>
+        $(".pagination  a").click(function () {
+            var page = $(this).data('page');
+            ajax_get_table('search-form2', page);
+            return false;
+        });
+
+        $('.minimal').change(function(){
+            $("input[name='id[]']:checkbox").prop('checked',$(this).is(':checked')?true:false);
+        });
+	</script>
+</block>

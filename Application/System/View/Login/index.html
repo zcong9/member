@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+  	<link href="__STATIC__/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min.css?v=4.0.0" rel="stylesheet">
+    <!--[if lt IE 8]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>if(window.top !== window.self){ window.top.location = window.location;}</script>
+    <style type="text/css">
+    	.gray-bg {
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+    <div class="middle-box text-center loginscreen  animated fadeInDown">
+    	
+        <div style="margin-top: 50%;">
+            <!--<div>
+                <h1 class="logo-name">H+</h1>
+            </div>-->
+            <h3 style="color: #000000;">方派会员管理系统</h3>
+            <form class="m-t" role="form" action="" onsubmit="return false">
+                <div class="form-group">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名" value="">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="form-control" placeholder="密码" value="">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="code" name="code" class="form-control" placeholder="验证码" value="">
+                </div>
+
+                <div class="form-group">
+                    <img class="" src="__CONTROLLER__/captcha" onclick="this.src='__CONTROLLER__/captcha/'+Math.random()">
+                </div>
+
+                <button type="submit" class="btn btn-primary block full-width m-b">登 录</button>
+               <!-- <p class="text-muted text-center"> <a href="login.html#"><small>忘记密码了？</small></a> | <a href="register.html">注册一个新账号</a>
+                </p>-->
+            </form>
+        </div>
+        
+    </div>
+</body>
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+
+<script type="text/javascript">
+	
+	window.onload=function(){
+		var oInput = document.getElementById("username");
+		oInput.focus();
+	}
+
+	var imgs = ['__STATIC__/img/p_big1.jpg', '__STATIC__/img/p_big1.jpg','__STATIC__/img/p_big1.jpg'];
+	var index = Math.round(Math.random()*2);
+	var img = imgs[index];
+	
+	document.body.onload = function(){
+		document.body.style.backgroundImage="url("+img+")";
+	}
+
+    $(function(){
+        $(":submit").click(function(){
+            $.ajax({
+                type: "POST",
+                url: "{:U('System/Login/checkLogin')}",
+                dataType:"json",
+                data:{username:$("input[name=username]").val(),password:$("input[name=password]").val(),code:$("input[name=code]").val()},
+                success:function(data){
+                	if(1 != data.code){
+                		alert(data.msg);
+                	} else{
+                		parent.window.location = window.location.protocol+'//' + window.location.host + '/index.php/system/index/index';
+                	}
+                }
+            });
+        });
+    })
+</script>
+</html>

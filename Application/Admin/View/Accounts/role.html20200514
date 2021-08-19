@@ -1,0 +1,152 @@
+<extend name="Public:base" />
+<block name="css">
+	<style>
+		.table-condensed tr td:first-child{
+			min-width: 5.8em;
+		}
+	</style>
+</block>
+<block name="main">
+
+<!--	<div class="section-content" id="editRoleModal" style="display: none;">-->
+	<div class="section-content" id="editRoleModal">
+		<form action="" method="post" id="roleForm">
+			<table class="table-condensed">
+				<tr>
+					<td>角色名称：</td>
+					<td>
+						<input type="hidden" name="id" value="">
+						<input type="text" name="role_name" value="">
+					</td>
+				</tr>
+				<tr>
+					<td>角色描述：</td>
+					<td><input type="text" name="role_desc" value=""></td>
+				</tr>
+				<tr>
+					<td>权限详情：</td>
+					<td class="distribution">
+						<volist name="menu" id="vo">
+							<div class="user-checkbox">
+								<input class="checkbox" id="checkbox{$vo.action_id}" type="checkbox" name="action_list[]" value="{$vo.action_id}">
+								<label for="checkbox{$vo.action_id}">{$vo.action_name}</label>
+							</div>
+						</volist>
+					</td>
+				</tr>
+			</table>
+			<div class="text-center marginT10">
+				<button type="button" class="btn btn-success" onclick="addEditAction()">保存</button>
+			</div>
+		</form>
+	</div>
+</block>
+<block name="js">
+	<script>
+		$("#detail-page").children().children("a").click(function() {
+			var page = parseInt($(this).data("page"));
+			console.log(page);
+			$.ajax({
+				url:"/index.php/admin/accounts/role",
+				data:{"page":page},
+				type:"get",
+				success:function(data){
+					$("#comment_list").html(data);
+				},
+				error:function(){
+					alert("出错了");
+				}
+			});
+		});
+
+		// 打开添加/修改角色框,并在编辑时实现数据填充
+		function showRoleModal(id){
+			var _url = '';
+			var titleMsg = '';
+			document.getElementById("roleForm").reset();  //重置表单数据
+			if(id){
+				titleMsg = '编辑';
+				_url = '';
+				$.ajax({
+					type: "get",
+					url: "/index.php/Admin/Accounts/modifyRole?id="+id,
+					data: {  },
+					dataType: "json",
+					success: function(data){
+						$("input[name='id']").val(data.id.replace(/[ ]/g,""));
+						$("input[name='role_name']").val(data.role_name);
+						$("input[name='role_desc']").val(data.role_desc?data.role_desc:"");
+						// $("select[name='parent_id'] option[value='"+(data.parent_id?data.parent_id:'')+"']").attr("selected", true);
+						var menu = data.menu; var i=0;
+						menu = JSON.stringify(menu);
+						$(".checkbox").each(function(){
+							if(menu.indexOf(':"'+$(this).val()+'"')>-1){
+								$(this).prop("checked",true);
+							}
+						})
+					}
+				});
+			}else{
+				titleMsg = '添加';
+				_url = '';
+			}
+			layer.open({
+				type: 1,
+				title: titleMsg+'角色',
+				content: $("#editRoleModal"),
+				area: ['60%','auto']
+			})
+		}
+
+		// 保存角色数据(添加、修改)
+		function addEditAction(){
+			$.ajax({
+				type: "post",
+				url: "/index.php/Admin/Accounts/addEditRole",
+				data: $("#roleForm").serialize(),
+				dataType: "json",
+				success: function(data){
+					if(data && data.code==10000){  //成功
+						layer.closeAll();
+						layer.msg(data.msg);
+						setTimeout(function(){
+							location.reload();
+						},800);
+					}else{
+						layer.msg(data.msg);
+					}
+				},
+				error: function(err){
+					layer.msg("网络延迟，请稍后再试~");
+				}
+			});
+		}
+
+		// 删除角色
+		function delRole(id){
+			layer.confirm('是否确定删除当前角色？删除角色后需要重新分配帐号权限', {
+				btn: ['确定','取消'] //按钮
+			}, function(){
+				$.ajax({
+					type: "post",
+					url: "/index.php/Admin/Accounts/delRole",
+					data: { "id":id },
+					dataType: "json",
+					success: function(data){
+						if(data && data.code == 10000){  //成功
+							layer.msg(data.msg);
+							setTimeout(function(){
+								location.reload();
+							},800);
+						}else{
+							layer.msg(data.msg);
+						}
+					},
+					error: function(err){
+						layer.msg("网络延迟，请稍后再试~");
+					}
+				});
+			});
+		}
+	</script>
+</block>

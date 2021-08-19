@@ -1,0 +1,44 @@
+<style>
+	.table th, .table td {
+		text-align: center;
+		vertical-align: middle!important;
+	}
+</style>
+<table id="tableList" class="table table-hover">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>角色名称</th>
+    <th>角色描述</th>
+    <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<volist name="lists" id="vo">
+    <tr id="trid{$vo.id}">
+        <td>{$vo.id}</td>
+        <td>{$vo.role_name}</td>
+        <td>{$vo.role_desc}</td>
+        <td><a class="btn btn-info btn-sm editPopup" data-url="{:U('edit',['id'=>$vo['id']])}" data-id="{$vo.id}" data-title="编辑-{$vo.role_name}">编辑</a></td>
+    </tr>
+</volist>
+</tbody>
+</table>
+<div>
+<ul class="pagination" id="detail-page">
+    {$page}
+</ul>
+</div>
+<block name="js">
+	<script>
+        $(".pagination  a").click(function () {
+            var page = $(this).data('page');
+            ajax_get_table('search-form2', page);
+            return false;
+        });
+
+        $('.minimal').change(function(){
+            $("input[name='id[]']:checkbox").prop('checked',$(this).is(':checked')?true:false);
+        });
+	</script>
+</block>

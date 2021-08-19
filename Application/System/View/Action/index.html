@@ -1,0 +1,143 @@
+
+<include file="Public:base" />
+<block name="main">
+    <section class="content">
+        <div class="row col-md-12" style="padding-left: 40px">
+            <form class="form-inline" id="search-form2">
+                <div class="form-group">
+                    <select class="form-control btn-sm" name="status" id="search_status">
+                        <option value="">状态</option>
+                        <option value="1">在用</option>
+                        <option value="0">停用</option>
+                    </select>
+                </div>
+
+                <a class="btn btn-primary btn-sm" type="submit" onclick=" ajax_get_table('search-form2',1)">搜索</a>
+
+                <a class="btn btn-success btn-sm editPopup" data-url="{:U('add')}">新增</a>
+                <a class="btn btn-danger btn-sm delPopup" data-url="{:U('delAll')}">批量删除</a>
+            </form>
+            <div id="ajax_return">
+                
+
+            </div>
+        </div>
+    </section>
+</block>
+
+<block name="js">
+
+    <script>
+    $(function(){
+        //编辑
+        $('body').off('click', '.editPopup');
+        $('body').on('click', '.editPopup', function (event) {
+            event.preventDefault();
+            var _this = $(this);
+            var title = _this.data('title') ? _this.data('title') : '新增';
+            var url = _this.data('url') ? _this.data('url') : "{:U('add')}";
+            var id = _this.data('id') || '';
+            layer.open({
+                type: 2,
+                title: title,
+                shadeClose: true,
+                shade: 0.6,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['75%', '90%'],
+                content: url,
+                end: function () {
+                    ajax_get_table('search-form2', cur_page);
+                }
+            });
+        });
+
+        /*删除*/
+        $('body').off('click', '.delPopup');
+        $('body').on('click', '.delPopup', function (event) {
+            event.preventDefault();
+            var _this = $(this);
+            var obj = new Object();
+            obj.title = _this.data('title') ? _this.data('title') : '确定要删除当前所选的行吗?';
+            obj.url = _this.data('url') ? _this.data('url') : "{:U('delete')}";
+            obj.ids = new Array();
+            var id = _this.data('id') || '';
+            if (id == '') {
+                var table_box = $('#tableList').find("tr td input[name='id[]']");
+                $(table_box).each(function () {
+                    if (true == $(this).is(':checked')) {
+                        obj.ids.push($(this).val());
+                    }
+                });
+            } else {
+                obj.ids.push(id);
+            }
+            if (obj.ids.length > 0) {
+                layer.msg(obj.title, {
+                    time: 0 //不自动关闭
+                    , btn: ['确定', '取消']
+                    , yes: function (index) {
+                        layer.close(index);
+                        $.post(obj.url, {'id': obj.ids}, function (data) {
+                            if (data.status == 1) {
+                                layer.msg(data.info, {icon: 1, closeBtn: 1, shadeClose: true});
+                                setTimeout(function () {
+                                    ajax_get_table('search-form2', 1);
+                                }, 1000);
+                            } else {
+                                layer.msg(data.info, {icon: 5, closeBtn: 1, shadeClose: true});
+                            }
+                        }, 'json');
+                    }
+                });
+            } else {
+                layer.msg('请选择要操作的数据行', function () {
+                });
+            }
+        });
+    })
+    /**
+     * 状态切换
+     * @param obj
+     */
+    function switchFun(obj) {
+        $.ajax({
+            url: "{:U('editStatus')}",
+            data: {
+                "status": $(obj).is(':checked') ? 1 : 0,
+                "merchant_id": $(obj).data('id'),
+            },
+            type: "post",
+            dataType: "json",
+            success: function (data) {
+                layer.msg(data.info);
+            },
+            error: function () {
+                layer.msg("系统异常", function () {
+                });
+            }
+        });
+    }
+
+    var cur_page = 0;
+    $(document).ready(function () {
+        ajax_get_table('search-form2', 1);
+    });
+    // ajax 抓取页面
+    function ajax_get_table(tab, page) {
+        cur_page = page; //当前页面 保存为全局变量
+        $.ajax({
+            type: "get",
+            contentType: false,
+            processData: false,
+            async: true,
+            cache: false,
+            url: "{:U('index')}?page=" + page,//+tab,
+            data: $('#' + tab).serialize(),// 你的formid
+            success: function (data) {
+                $("#ajax_return").html('');
+                $("#ajax_return").append(data);
+            }
+        });
+    }
+    </script>
+</block>

@@ -1,0 +1,617 @@
+<extend name="Public:base" />
+<block name="css">
+	<link rel="stylesheet" type="text/css" href="__PUBLIC__/bootstrap/css/bootstrap.min.css">
+</block>
+<block name="main">
+
+	<body class="order-body clear"> 
+		<div id="ng-app" class="order-content" v-cloak>
+			<div class="order-content">
+				<div>
+					<!-- 左边导航区域 -->
+					<left-nav :current="current" :goods="goods" @go-url="goUrl" />
+				</div>
+
+				<!-- 中间菜品区域 -->
+				<div class="foods-wrapper dish-list" ref="foodsWrapper">
+					<ul>
+						<li v-for="(item, index) in goods" :key="index" class="food-list food-list-hook">
+							<h1 class="title">{{ item.category_name }}</h1>
+							<ul v-for="(food, fid) in item.food_list" class="food-item border-1px">
+								<div class="dish-item flex-content vertical-flex">
+									<img :src="food.img" class="dish-icon lazy" @click="showChoose(food)" />
+									<div class="dish-right flex-main">
+										<div class="dish-name">
+											{{ food.food_name }}
+										</div>
+										<div class="dish-price">
+											<span>&yen;</span>
+											<b class="price-num">{{ food.food_price }}</b>
+										</div>
+										<cart-control :food="food" @showchooselist="showChoose" @increase-food="increaseFood"></cart-control>
+									</div>
+								</div>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<!-- 底部区域 -->
+			<footer class="order-footer flex-content vertical-flex">
+				<i class="iconfont icon-up"></i>
+				<div class="order-footer-left flex-main flex-content vertical-flex" @click="cardShow">
+					<i class="iconfont icon-canyin order-footer-icon"></i>
+					<span class="order-footer-num" id="numv" v-if="totalCount > 0">{{ totalCount }}</span
+          >
+          <span class="order-footer-num" id="numv" v-else>0</span>
+					<div>
+						<span>&yen;</span>
+						<span class="order-footer-total" id="Total">{{ totalPrice | priceFilter }}</span
+            >
+          </div>
+        </div>
+        <div class="order-footer-btn flex-content vertical-flex" @click="send">
+          	<span>选好了</span>
+			<i class="iconfont icon-more"></i>
+		</div>
+			</footer>
+
+			<!-- 选择规格弹窗 -->
+			<transition name="fade">
+				<div id="foodModal" class="modal" v-show="detailShow" style="display: block;">
+					<div class="modal-content" v-for="(item, index) in detailGood" :key="index">
+						<img :src="detailGood.food_info.img" class="modal-dish-icon" style="height: 225px;" />
+						<div class="modal-dish-info flex-content vertical-flex">
+							<div class="flex-main">
+								<div class="modal-dish-name">
+									{{ detailGood.food_info.food_name }}
+								</div>
+								<div class="dish-price">
+									<small>￥</small>
+									<b class="price-num" id="food_price">{{ detailGood.food_info.food_price }}</b
+                  >
+                </div>
+              </div>
+              <div class="modal-dish-right text-right">
+                <button class="plus-btn" @click="reductDetail(detailGood)">
+                  <i class="iconfont icon-minus"></i>
+                </button>
+                <b class="food-num">{{ detailGood.count }}</b>
+									<button class="plus-btn" @click="addDetail(detailGood)">
+                  <i class="iconfont icon-plus"></i>
+                </button>
+								</div>
+							</div>
+							<!--<div class="modal-dish-describe">{{detailGood.food_info.food_desc}}</div>-->
+							<ul class="attr-list clearfix" v-for="(item1, ind1) in detailGoodGuige" :key="ind1">
+								<li class="attr-item-name">{{ item1.name }}</li>
+								<li class="attr-select-item attr-sm" v-for="(item2, ind2) in item1.attrs" :class="{ 'attr-select': item2.checked }" @click="changePrice(item2, ind2)" :key="`attr-${ind2}`">
+									<div class="attr-name">
+										<span>{{ item2.food_type_name }}</span>
+									</div>
+									<div>+{{ item2.plus_price }}元</div>
+								</li>
+							</ul>
+						</div>
+						<div class="modal-bottom flex-content">
+							<button class="flex-main" type="button" @click="returns">
+              <span>&lt;&nbsp;</span>返回
+            </button>
+							<button class="flex-main" type="button" id="food-checked" @click="addOrderItem">
+              确认
+            </button>
+						</div>
+					</div>
+			</transition>
+
+			<!-- 明细列表弹窗区域 -->
+			<transition name="fade">
+				<div class="order-cart" v-show="cartShow && computedSelectedFoods.length" @click.stop="cardShow">
+					<div class="order-cart-content">
+						<i class="iconfont icon-down" @click="cardShow"></i>
+						<div class="order-cart-main">
+							<div id="foodlist">
+								<div class="dish-item flex-content vertical-flex" v-for="(item, index) in computedSelectedFoods" :key="`dish-${index}`">
+									<div class="flex-main">
+										<div class="dish-name">
+											{{ item | getItemName }}
+										</div>
+										<div class="dish-price">
+											<small>&yen;</small>'
+											<span class="cart-num"><b>{{ item | getItemPrice }}</b>元</span
+                      >
+                    </div>
+                  </div>
+                  <button class="minus-btn" @click.stop="decreaseItem(item)">
+                    <i class="iconfont icon-minus"></i>
+                  </button>
+                  <div class="cart-num">{{ item.count }}</div>
+                  <button class="plus-btn" @click.stop="increaseItem(item)">
+                    <i class="iconfont icon-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </div>
+	</body>
+</block>
+<block name="js">
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	<script src="__PUBLIC__/bootstrap/js/bootstrap.min.js"></script>
+	<script src="__PUBLIC__/layer/mobile/layer.js"></script>
+	<script src="__PUBLIC__/js/vue.js"></script>
+	<script src="__PUBLIC__/js/vue-router.js"></script>
+	<script src="__PUBLIC__/js/vue-axios.js"></script>
+	<script src="__PUBLIC__/js/bscroll.min.js"></script>
+<!--	<script src="__PUBLIC__/js/qs.js"></script>-->
+	<script type="text/javascript">
+		Vue.prototype.$http = axios;
+
+    Vue.component("cart-control", {
+      props: ["food"],
+      methods: {
+        findfoodinfo(food, flag) {
+          if (flag == 0) {
+            if (!food.count) {
+              Vue.set(food, "count", 1);
+            } else {
+              food.count += 1;
+            }
+            this.$emit("increase-food", food);
+          } else if (flag == 1) {
+            this.$emit("showchooselist", food);
+          }
+        },
+        decreaseCart(food) {
+          if (food.count) {
+            food.count--;
+          }
+        }
+      },
+      template: `
+        <div>
+           <div
+               class="selectAttr-btn"
+               v-if="food.have_attribute == 1"
+               @click="findfoodinfo(food, '1')"
+           >
+               选规格
+           </div>
+           <div class="cartcontroll" v-else-if="food.have_attribute == 0">
+               <transition name="slide-fade">
+                   <div
+                       class="decrease plus-btn"
+                       @click="decreaseCart(food)"
+                       v-show="food.count > 0"
+                   >
+                       <i class=" iconfont icon-minus"></i>
+                   </div>
+               </transition>
+               <div class="cart-num" v-show="food.count > 0">{{ food.count }}</div>
+               <div class="add plus-btn" @click="findfoodinfo(food, '0')">
+                   <i class="iconfont icon-plus"></i>
+               </div>
+           </div>
+       </div
+    `
+    });
+
+    Vue.component("left-nav", {
+      name: "left-nav",
+      props: ["current", "goods"],
+      methods: {
+        goUrl(index) {
+          this.$emit("go-url", index);
+        }
+      },
+      mounted() {
+        new BScroll(this.$refs.menuWrapper, {
+          click: true
+        });
+      },
+      template: `
+       <div class="classify-bd" id="navbarExample" ref="menuWrapper">
+           <ul class="nav">
+               <li
+                   v-for="(item, index) in goods"
+                   :class="current == index ? 'active' : ''"
+                   @click="goUrl(index)"
+               >
+                   <a class="classify-item" href="javascript:;">
+                       <img class="classify-icon" :src="item.img" />
+                       <div class="classify-name">
+                           {{ item.category_name }}
+                       </div>
+                   </a>
+               </li>
+           </ul>
+       </div>
+    	    `
+    });
+
+    var vm = new Vue({
+      el: "#ng-app",
+      name: "app",
+      data() {
+        return {
+          listHeight: [],
+          scrollY: 0,
+          current: 0, //左侧列表选中状态
+          goods: [], //产品数据
+          selectedFoods: [],
+          detailShow: false,
+          detailGood: [],
+          detailGoodGuige: [],
+          cartShow: false
+        };
+      },
+      beforeCreate(){
+      	layer.open({
+			type: 2,
+			shadeClose: false
+		});
+      },
+      components: ["left-nav", "center-items"],
+      computed: {
+        computedSelectedFoods() {
+          return this.selectedFoods.filter(item => item.count);
+        },
+        totalPrice: function() {
+          let total = 0;
+          this.selectedFoods.forEach(food => {
+            if (food.food_info) {
+              total += food.count * +food.food_info.food_price;
+              const specs = Object.values(food.food_specification_list);
+
+              specs.forEach(spec => {
+                spec.attrs.forEach(item => {
+                  if (item.checked) {
+                    total += food.count * +item.plus_price;
+                  }
+                });
+              });
+            } else {
+              total += food.food_price * food.count;
+            }
+          });
+          return total;
+        },
+        totalCount: function() {
+          let count = 0;
+          this.selectedFoods.forEach(food => {
+            count += food.count;
+          });
+          return count;
+        },
+        computedResult() {
+            return this.computedSelectedFoods.map(food => {
+                if (!food.food_info) {
+                    return [food.food_id, food.count, ""];
+                }
+
+                let arr = [];
+                const specs = Object.values(food.food_specification_list);
+                specs.forEach(spec => {
+                    spec.attrs.forEach(attr => {
+                        if (attr.checked) {
+                            arr.push(attr.food_type_id)
+                        }
+                    });
+                });
+                return [food.food_info.food_id, food.count, arr.join('-')];
+//              return {'food_id':food.food_info.food_id, 'food_num':food.count, 'food_attr':arr.join('-')};
+            });
+        },
+      },
+      //过滤器
+      filters: {
+        priceFilter(data) {
+          return data.toFixed(2);
+        },
+        getItemPrice(item) {
+          if (item.food_info) {
+            let price = +item.food_info.food_price;
+            const specs = Object.values(item.food_specification_list);
+
+            specs.forEach(spec => {
+              spec.attrs.forEach(attr => {
+                if (attr.checked) {
+                  price += +attr.plus_price;
+                }
+              });
+            });
+            return price;
+          }
+          return item.food_price;
+        },
+        getItemName(item) {
+          if (item.food_info) {
+            let name = item.food_info.food_name;
+            const specs = Object.values(item.food_specification_list);
+
+            specs.forEach(spec => {
+              spec.attrs.forEach(attr => {
+                if (attr.checked) {
+                  name += `+ ${attr.food_type_name}`;
+                }
+              });
+            });
+            return name;
+          }
+          return item.food_name;
+        }
+      },
+      methods: {
+        increaseFood(food) {
+          this.$emit("increase-food", food);
+        },
+        showChoose(food) {
+          this.$emit("show-choose", food);
+        },
+        _initScroll() {
+          this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+            click: true,
+            probeType: 3
+          });
+          this.foodsScroll.on("scroll", pos => {
+            this.scrollY = Math.abs(Math.round(pos.y));
+          });
+        },
+        _calculateHeight() {
+          let foodList = this.$refs.foodsWrapper.getElementsByClassName(
+            "food-list-hook"
+          );
+          let height = 0;
+          this.listHeight.push(height);
+          for (let i = 0; i < foodList.length; i++) {
+            let item = foodList[i];
+            height += item.clientHeight;
+            this.listHeight.push(height);
+          }
+        },
+        increaseFood(food) {
+          const foodIdList = this.selectedFoods.map(o => o.food_id);
+          if (!foodIdList.includes(food.food_id)) {
+            this.selectedFoods.push(food);
+          }
+        },
+        decreaseItem(food) {
+          const pos = this.getFoodPos(food);
+          this.selectedFoods[pos].count--;
+        },
+        increaseItem(food) {
+          const pos = this.getFoodPos(food);
+          this.selectedFoods[pos].count++;
+        },
+        getData() {
+//        this.$http.get("__PUBLIC__/js/test.json").then(res => {
+//          if (res.data.code == 0) {
+//            this.goods = res.data.data.category_list;
+//            let arr = [];
+//            for (let i in this.goods) {
+//              arr.push(this.goods[i]);
+//            }
+//            return (this.goods = arr);
+//          }
+//        });
+	        this.$http.post("/index.php/Mobile/Index/ajaxGetFoodInfo").then(res => {
+	            if (res.data.code == 0) {
+	            	layer.closeAll('loading');
+	              	this.goods = res.data.data.category_list;
+	              	let arr = [];
+	              	for (let i in this.goods) {
+	                	arr.push(this.goods[i]);
+	              	}
+	              	return (this.goods = arr);
+	            }
+	        });
+        },
+        goUrl(index) {
+          	this.current = index;
+          	let foodList = this.$refs.foodsWrapper.getElementsByClassName("food-list-hook");
+          	let ref = foodList[index];
+          	this.foodsScroll.scrollToElement(ref, 300);
+        },
+        showChoose(foods) {
+          this.detailShow = true;
+          var food_id = foods.food_id;
+//        this.$http.get("__PUBLIC__/js/guige1.json").then(res => {
+//          if (res.data.code == 0) {
+//            this.detailGood = res.data.data;
+//            this.detailGoodGuige = res.data.data.food_specification_list;
+//            if (!this.detailGood.count) {
+//              Vue.set(this.detailGood, "count", 1);
+//            }
+//          }
+//        });
+			
+			this.$http.post("/index.php/Mobile/Index/findfoodinfo/food_id/"+ food_id)
+            .then((res)=> {
+                if (res.data.code == 0) {
+	              this.detailGood = res.data.data;
+	              this.detailGoodGuige = res.data.data.food_specification_list;
+	              if (!this.detailGood.count) {
+	                Vue.set(this.detailGood, "count", 1);
+	              }
+	            }          
+            });
+        },
+        changePrice(item2, index) {
+          if (item2.checked) {
+            Vue.set(item2, "checked", false);
+          } else {
+            Vue.set(item2, "checked", true);
+          }
+        },
+        addDetail(detailGood) {
+          const food_price = detailGood.food_info.food_price;
+
+          if (!detailGood.count) {
+            Vue.set(this.detailGood, "count", 1);
+          } else {
+            this.detailGood.count += 1;
+          }
+        },
+        reductDetail(detailGood) {
+          const food_price = detailGood.food_info.food_price;
+
+          if (!detailGood.count || detailGood.count == 1) {
+            Vue.set(this.detailGood, "count", 1);
+          } else {
+            this.detailGood.count -= 1;
+          }
+        },
+        //确定
+        addOrderItem() {
+          const pos = this.getFoodPos(this.detailGood);
+          if (pos > -1) {
+            this.selectedFoods[pos].count += this.detailGood.count;
+          } else {
+            this.selectedFoods.push(this.detailGood);
+          }
+
+          this.detailShow = false;
+        },
+        getFoodPos(food) {
+          const foodIds = this.selectedFoods.map(this.getFoodId);
+          const foodId = this.getFoodId(food);
+          return foodIds.indexOf(foodId);
+        },
+        getFoodId(food) {
+          if (food.food_info) {
+            let id = food.food_info.food_id;
+            const specs = Object.values(food.food_specification_list);
+
+            specs.forEach(spec => {
+              spec.attrs.forEach(attr => {
+                if (attr.checked) {
+                  id += `+${attr.food_type_id}`;
+                }
+              });
+            });
+
+            return id;
+          } else {
+            return food.food_id;
+          }
+        },
+        returns() {
+          this.detailShow = false;
+        },
+        cardShow() {
+          if (this.computedResult == '') {
+            layer.open({
+              content: "尚未添加菜品",
+              skin: "msg",
+              time: 2 //2秒后自动关闭
+            });
+          } else {
+            this.cartShow = !this.cartShow;
+          }
+        },
+//      	提交
+		send(){
+			var computedResult = this.computedResult;
+			var controller_url = '/index.php/Mobile/Index';
+			let formData = new FormData();
+			for(var i = 0 ; i< computedResult.length; i++){
+				formData.append('order_food_data['+ [i] +'][food_id]', computedResult[i][0])
+				formData.append('order_food_data['+ [i] +'][food_num]', computedResult[i][1])
+				formData.append('order_food_data['+ [i] +'][food_attr]', computedResult[i][2])
+			}
+			let config = {
+			   headers: {
+			    'Content-Type': 'application/json;charset=UTF-8'
+			    } 
+			}
+			this.$http.post('/index.php/Mobile/Index/PlaceOrder/', formData , config)
+			.then(res=>{
+				console.log(res);
+				if(res.data.code == 0){
+					layer.open({
+		              content: res.data.msg,
+		              skin: "msg",
+		              time: 2 //2秒后自动关闭
+		           });
+					console.log(res.data.data.order_type);
+//		            1为预点餐，2为在线快速点餐，3为到店点餐
+		            if(res.data.data.order_type == 1){
+		            	window.location.href = controller_url + "/selectEatTime/order_sn/" + res.data.data.order_sn
+		            }else if(res.data.data.order_type == 2){
+		            	// console.log(controller_url + "/pay_old_user/order_sn/" + res.data.data.order_sn);return;
+		            	window.location.href = controller_url + "/pay_old_user/order_sn/" + res.data.data.order_sn
+		            }else if(res.data.data.order_type == 3){
+		            	window.location.href = controller_url + "/pay_old/order_sn/" + res.data.data.order_sn
+		            }
+				}    
+			});
+		}
+      },
+      mounted() {
+        this.getData();
+        this._initScroll();
+        this._calculateHeight();
+      }
+    });
+    
+    function weixin_pay(order_sn){
+    var check=1;
+    var myDate = new Date();
+    var time=myDate.getHours()+":"+myDate.getMinutes();
+    var url=controller_url + "/updateOrder/";
+    $.post(url, { use_time: time, use_day: check, order_sn: order_sn }, function(data) {
+        if (data.code == 1) {
+            layer.msg(data.msg);
+            return false;
+        }
+        callpay();
+ 	});
+}
+//调用微信JS api 支付
+        function jsApiCall() {
+            console.log({$jsApiParameters});
+            WeixinJSBridge.invoke(
+                'getBrandWCPayRequest',
+               <?php if(!empty($jsApiParameters))echo $jsApiParameters.',';?>
+                function(res) {
+                    WeixinJSBridge.log(res.err_msg);
+                    if (res.err_msg == 'get_brand_wcpay_request:cancel') {
+                        alert("您已取消了此次支付");
+                        location.href = "/index.php/mobile/index/homePage/restaurant_id/{$restaurant_id}/business_id/{$business_id}/restaurants_id/{$restaurants_id}/pay_status/online";
+                        return;
+                    } else if (res.err_msg == 'get_brand_wcpay_request:fail') {
+                        alert(JSON.stringify(res));
+                        return;
+                    } else if (res.err_msg == 'get_brand_wcpay_request:ok') {
+                        var restaurant_id = $("#restaurant_id").val();
+                        var desk_code = $("#desk_code").val();
+                        //                            location.href="{:U('Order/index', 'restaurant_id=restaurant_id&business_id=business_id')}";
+                        location.href = "/index.php/Mobile/Order/index/restaurant_id/{$restaurant_id}/business_id/{$business_id}/restaurants_id/{$restaurants_id}/";
+                    } else {
+                        alert("未知错误" + res.error_msg);
+                        return;
+                    }
+                }
+            );
+        }
+
+        function callpay() {
+
+            if (typeof WeixinJSBridge == "undefined") {
+                if (document.addEventListener) {
+                    document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+                } else if (document.attachEvent) {
+                    document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                    document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+                }
+            } else {
+                jsApiCall();
+            }
+        }
+        <?php if(!empty($weixin_pay)) {echo 'window.onload=function(){weixin_pay("'.$weixin_pay.'");}';}?>
+	</script>
+</block>

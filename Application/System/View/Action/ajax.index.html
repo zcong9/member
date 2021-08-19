@@ -1,0 +1,52 @@
+<style>
+	.table th, .table td {
+		text-align: center;
+		vertical-align: middle!important;
+	}
+</style>
+<table id="tableList" class="table table-hover">
+<thead>
+<tr>
+    <th><input type="checkbox" class="minimal checkbox-toggle"/>全选</th>
+    <th>ID</th>
+    <th>权限名</th>
+    <th>权限描述</th>
+    <th>模块名</th>
+    <th>控制器名</th>
+    <th>方法名</th>
+    <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<volist name="lists" id="vo">
+    <tr id="trid{$vo.id}">
+        <td><input type="checkbox" name="id[]" value="{$vo.id}" /></td>
+        <td>{$vo.id}</td>
+        <td>{$vo.action_name}</td>
+        <td>{$vo.desc}</td>
+        <td>{$vo.model}</td>
+        <td>{$vo.controller}</td>
+        <td>{$vo.action}</td>
+        <td><a class="btn btn-info btn-sm editPopup" data-url="{:U('edit',['id'=>$vo['id']])}" data-id="{$vo.id}" data-title="编辑-{$vo.action_name}">编辑</a>&nbsp;&nbsp;<a class="btn btn-info btn-sm delPopup" data-url="{:U('delete',['id'=>$vo['id']])}" data-id="{$vo.id}" data-title="删除-{$vo.action_name}">删除</a></td>
+    </tr>
+</volist>
+</tbody>
+</table>
+<div>
+<ul class="pagination" id="detail-page">
+    {$page}
+</ul>
+</div>
+<block name="js">
+	<script>
+        $(".pagination  a").click(function () {
+            var page = $(this).data('page');
+            ajax_get_table('search-form2', page);
+            return false;
+        });
+
+        $('.minimal').change(function(){
+            $("input[name='id[]']:checkbox").prop('checked',$(this).is(':checked')?true:false);
+        });
+	</script>
+</block>

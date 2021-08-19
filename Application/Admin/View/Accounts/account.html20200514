@@ -1,0 +1,187 @@
+<extend name="Public:base" />
+<block name="css">
+	<style>
+		.table-condensed tr td:first-child{
+			min-width: 5.8em;
+		}
+	</style>
+</block>
+<block name="main">
+	<section class="container-fluid">
+		<div class="main-content">
+			<div class="role-head">
+				<button class="btn btn-primary btn-sm" onclick="showAccountModal()">+{{langData.AddAccount[lang]}}</button>
+			</div>
+			<div id="mytable">
+				<table class="agent-table table-hover">
+					<thead>
+						<tr class="text-center">
+							<td>{{langData.RoleName[lang]}}</td>
+							<td>{{langData.accounts[lang]}}</td>
+							<td>{{langData.operating[lang]}}</td>
+						</tr>
+					</thead>
+					<tbody>
+						<volist name="accountList" id="vo">
+							<tr>
+								<td>{$vo.manager_name}</td>
+								<td>{$vo.login_account}</td>
+								<td>
+									<button class="btn btn-primary" onclick="showAccountModal({$vo.id})">{{langData.edit[lang]}}</button>
+									<button class="btn btn-danger" onclick="delRole({$vo.id})">{{langData.delete[lang]}}</button>
+								</td>
+							</tr>
+						</volist>
+					</tbody>
+				</table>
+				<div>
+					<ul class="pagination" id="detail-page">
+						{$page}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div class="section-content" id="editRoleModal" style="display: none;">
+		<form action="" method="post" id="roleForm">
+			<table class="table-condensed">
+				<tr>
+					<td>{{langData.name[lang]}}：</td>
+					<td>
+						<input type="hidden" name="id" value="">
+						<input type="text" name="manager_name" value="">
+					</td>
+				</tr>
+				<tr>
+					<td>{{langData.accounts[lang]}}：</td>
+					<td><input type="text" name="login_account" value=""></td>
+				</tr>
+				<tr>
+					<td>{{langData.password[lang]}}：</td>
+					<td><input type="password" name="password" value=""></td>
+				</tr>
+				<tr>
+					<td>{{langData.confirmPassword[lang]}}：</td>
+					<td><input type="password" name="passwords" value=""></td>
+				</tr>
+				<tr>
+				<td>{{langData.RoleType[lang]}}：</td>
+					<td>
+						<select name="role_id">
+							<volist name="roleList" id="vo">
+								<option value="{$vo.id}">{$vo.role_name}</option>
+							</volist>
+						</select>
+					</td>
+				</tr>
+			</table>
+			<div class="text-center marginT10">
+				<button type="button" class="btn btn-success" onclick="addEditAction()">{{langData.save[lang]}}</button>
+			</div>
+		</form>
+	</div>
+</block>
+<block name="js">
+	<script>
+		$("#detail-page").children().children("a").click(function() {
+			var page = parseInt($(this).data("page"));
+			console.log(page);
+			$.ajax({
+				url:"/index.php/admin/accounts/account",
+				data:{"page":page},
+				type:"get",
+				success:function(data){
+					$("#comment_list").html(data);
+				},
+				error:function(){
+					alert(vm.langData.networkError[vm.lang]);
+				}
+			});
+		});
+
+		// 打开添加/修改角色框,并在编辑时实现数据填充
+		function showAccountModal(id){
+			var _url = '';
+			var titleMsg = '';
+			document.getElementById("roleForm").reset();  //重置表单数据
+			if(id){
+				titleMsg = vm.langData.edit[vm.lang];
+				_url = '';
+				$.ajax({
+					type: "get",
+					url: "/index.php/Admin/Accounts/modifyAccount?id="+id,
+					data: {  },
+					dataType: "json",
+					success: function(data){
+						$("input[name='id']").val(data.id.replace(/[ ]/g,""));
+						$("input[name='manager_name']").val(data.manager_name);
+						$("input[name='login_account']").val(data.login_account?data.login_account:"");
+						$("input[name='password']").val(data.password?data.password:"");
+						$("input[name='passwords']").val(data.password?data.password:"");
+						$("select[name='role_id'] option[value='"+(data.role_id?data.role_id:'')+"']").attr("selected", true);
+					}
+				});
+			}else{
+				titleMsg = vm.langData.AddTo[vm.lang];
+				_url = '';
+			}
+			layer.open({
+				type: 1,
+				title: titleMsg+vm.langData.role[vm.lang],
+				content: $("#editRoleModal"),
+				area: ['370px','auto']
+			})
+		}
+		
+		// 保存角色数据(添加、修改)
+		function addEditAction(){
+			$.ajax({
+				type: "post",
+				url: "/index.php/Admin/Accounts/addEditAccount",
+				data: $("#roleForm").serialize(),
+				dataType: "json",
+				success: function(data){
+					if(data && data.code==10000){  //成功
+						layer.closeAll();
+						layer.msg(data.msg);
+						setTimeout(function(){
+							location.reload();
+						},800);
+					}else{
+						layer.msg(data.msg);
+					}
+				},
+				error: function(err){
+					layer.msg(vm.langData.NetworkError[vm.lang]);
+				}
+			});
+		}
+		
+		// 删除角色
+		function delRole(id){
+			layer.confirm(vm.langData.DeleteCurrentRole[vm.lang], {
+				btn: [vm.langData.yes[vm.lang],vm.langData.cancel[vm.lang]] //按钮
+			}, function(){
+				$.ajax({
+					type: "post",
+					url: "/index.php/Admin/Accounts/delAccount",
+					data: { "id":id },
+					dataType: "json",
+					success: function(data){
+						if(data && data.code == 10000){  //成功
+							layer.msg(data.msg);
+							setTimeout(function(){
+								location.reload();
+							},800);
+						}else{
+							layer.msg(data.msg);
+						}
+					},
+					error: function(err){
+						layer.msg(vm.langData.NetworkError[vm.lang]);
+					}
+				});
+			});
+		}
+	</script>
+</block>

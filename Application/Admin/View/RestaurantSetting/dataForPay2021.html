@@ -1,0 +1,304 @@
+<extend name="Public:base" />
+<block name="main">
+	<ul id="myTab" class="nav nav-tabs">
+		<volist name="configList" id="vo">
+			<li <eq name="key" value="0">class="active"</eq>>
+				<a href="#oy_wxpay_{$vo.id}" data-toggle="tab" id="oy_wxpay_{$vo.id}">
+					<eq name="vo.type" value="1">微信</eq>
+					<eq name="vo.type" value="2">支付宝</eq>
+				</a>
+			</li>
+		</volist>
+	</ul>
+	<div class="pay-content">
+		<div id="myTabContent" class="tab-content">
+			<!-- 普通微信 -->
+			<volist name="configList" id="vo">
+			<div class="tab-pane fade in active clearfix" id="oy_wxpay_{$vo.id}">
+				<form action="javascript:void(0)" id="wxpayForm" method="POST" enctype="multipart/form-data">
+					<table class="table-condensed">
+						<tbody>
+						<eq name="vo.type" value="1">
+							<input type="hidden" value="{$vo.id}" name="id">
+							<tr>
+								<td>
+									{{ langData.WeChatBusinessNumber[lang] }}:
+								</td>
+								<td>
+									<!-- langData.subBusiness[lang]  -->
+									<input type="text" value="{$vo.config.mchid}" name="wxpay_mchid" id="wxpay_mchid" />
+								</td>
+								<td>
+									<span class="section-tips">
+										 {{ langData.WechatPaymentAssigned[lang] }}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									{{ langData.officialAccountAPPID[lang] }}:
+								</td>
+								<td>
+									<input type="text" value="{$vo.config.appid}" name="wxpay_appid" id="wxpay_appid" />
+								</td>
+								<td>
+									<span class="section-tips">
+										 {{ langData.WechatPublicID[lang] }}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									{{ langData.MerchantPaymentkey[lang] }}
+								</td>
+								<td>
+									<input type="text" value="{$vo.config.key}" name="wxpay_key" id="wxpay_key" />
+								</td>
+								<td>
+									<span class="section-tips">
+									{{ langData.MerchantPaymentkeyDetail[lang] }}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									{{ langData.officialAccountKey[lang] }}:
+								</td>
+								<td>
+									<input type="text" value="{$vo.config.appsecret}" name="wxpay_appsecret" id="wxpay_appsecret" />
+								</td>
+								<td>
+									<span class="section-tips">
+										{{ langData.officialAccountAPPIDKeyTips[lang] }}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<button class="blue-btn" data-paytype="wxpay" onclick="setPayInfo(this)">
+										{{ langData.save[lang] }}
+									</button>
+								</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>
+									<button class="file-content blue-btn">
+										<span>
+											{{ langData.certificate[lang] }}
+										</span>
+										<input type="file" id="myfile1" name="file1" onchange="certUpload(this,'apiclient_cert','file_cert')" />
+									</button>
+									<input type="hidden" name="merchant_id" id="merchant_id" value="{$Think.session.merchant_id}" />
+								</td>
+								<td id="file_cert"></td>
+								<td>
+									<span class="section-tips">
+										{{ langData.UsedUploading[lang] }}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<button class="file-content blue-btn">
+										<span>
+											{{ langData.certificateKey[lang] }}
+										</span>
+										<input type="file" id="myfile2" name="file2" onchange="certUpload(this,'apiclient_key','file_key')" />
+									</button>
+								</td>
+								<td id="file_key"></td>
+								<td>
+									<span class="section-tips">
+										{{ langData.UsedUploadingFile[lang] }}
+									</span>
+								</td>
+							</tr>
+						</tbody>
+						</eq>
+					</table>
+				</form>
+			</div>
+			</volist>
+		</div>
+	</div>
+</block>
+<block name="js">
+	<script src="__PUBLIC__/js/PayInfo.js?20190424"></script>
+	<script>
+		function setPayInfo(obj){
+		    var type = $(obj).data("paytype");
+		    console.log(type);
+		    var formData;
+		    if(type == 'wxpay'){
+		        var formName1 = "wxpayForm";
+		        var form1     = $("#"+formName1)[0];
+		        formData      = new FormData(form1);
+		    }else if (type == "alipay") {
+		        var formName5 = "oy_alipayForm";
+		        var form5     = $("#"+formName5)[0];
+		        formData      = new FormData(form5);
+		    }
+		    console.log(formData);
+		    // return false;
+		    $.ajax({
+		        url:"/index.php/admin/RestaurantSetting/editAddPayInfo/type/"+type,
+		        data:formData,
+		        type:'post',
+		        dataType:'text',
+		        contentType:false,
+		        cache:false,
+		        processData:false,
+		        success:function(data){
+		            layer.msg(data);
+		        },
+		        error:function(){
+		            layer.msg(vm.langData.networkError[vm.lang]);
+		        }
+		    });
+		}
+        function submitQwxpay(obj){
+            var type = $(obj).data("paytype");
+			var form2 = $("#"+type+"Form")[0];
+			formData = new FormData(form2);
+            $.ajax({
+                url:"/index.php/admin/RestaurantSetting/editAddPayInfo/type/"+type,
+                data:formData,
+                type:'post',
+                dataType:'text',
+                contentType:false,
+                cache:false,
+                processData:false,
+                success:function(data){
+                    layer.msg(vm.langData.success[vm.lang]);
+                },
+                error:function(){
+                    layer.msg(vm.langData.networkError[vm.lang]);
+                }
+            });
+        }
+
+		// 上传文件显示
+		function preview(file, id) {
+			var prevDiv = document.getElementById(id);
+			if (file.files && file.files[0]) {
+				console.log(file.files);
+				var file_size = file.files[0].size;
+				if (file_size / 1024 < 1024) {
+					file_size = (file_size / 1024).toFixed(1) + "K";
+				} else if (file_size >= 1024 * 1024) {
+					file_size = ((file_size / 1024) / 1024).toFixed(1) + "M";
+				} else if (file_size >= 1024 * 1024 * 1024) {
+					file_size = ((file_size / 1024) / 1024 / 1024).toFixed(1) + "G";
+				}
+				prevDiv.innerHTML = file.files[0].name + " --- " + file_size;
+			}
+		}
+		function changeStatus(obj) {
+			var value = $(obj).val();
+			var config_name = $(obj).attr("name");
+			$.ajax({
+				url: "/index.php/Admin/restaurantSetting/selectPay",
+				data: {
+					"value": value,
+					"config_name": config_name
+				},
+				type: "post",
+				success: function() {
+					layer.msg(vm.langData.success[vm.lang]);
+				}
+			});
+		}
+
+		function is_open(name, obj) {
+			var config_name = $(obj).attr("name");
+			var cls = "." + name;
+			var hschek = $(cls).is(':checked');
+			if (hschek) {
+				status = 1;
+			} else {
+				status = 0;
+			}
+			$.ajax({
+				url: "/index.php/Admin/restaurantSetting/selectPay",
+				data: {
+					"value": status,
+					"config_name": config_name
+				},
+				type: "post",
+				success: function() {
+					layer.msg(vm.langData.success[vm.lang]);
+				}
+			});
+		}
+		// 状态开启方法
+		function is_mode(obj) {
+			var status = $(obj).val();
+			$.ajax({
+				url: "/index.php/Admin/restaurantSetting/selectMode",
+				data: {
+					"mode": status
+				},
+				type: "post",
+				success: function() {
+					layer.msg(vm.langData.success[vm.lang]);
+					setTimeout(function(){
+						location.reload();
+					},1000);
+				}
+			});
+		}
+
+		function changeUrl() {
+			var aliNumber = $("#aliPid").val();
+			if (aliNumber) {
+				var url = "/index.php/admin/restaurantSetting/appToAppAuth/aliNumber/" + aliNumber;
+				window.open(url);
+			}
+		}
+
+		//设置余额开关
+		// function to_open_remind(that,url){
+		// 	var status;
+		// 	if($(that).is(':checked')) {
+		// 		status = 1;
+		// 	}else{
+		// 		status = 0;
+		// 	}
+		// 	// 发送ajax
+		// 	$.post('/index.php/Admin/Member/remind_set',{"if_open_remind":status}, function(data){
+		// 		var object = JSON.parse(data);
+		// 		if(object.code === 1){
+		// 			layer.msg(object.msg);
+		// 			if(object.if_open === '1'){
+		// 				$('[name="if_open_remind"]').prop("checked", true);
+		// 			}else{
+		// 				$('[name="if_open_remind"]').prop("checked", false);
+		// 			}
+		// 		}else{
+		// 			layer.msg(object.msg);
+		// 		}
+		// 	});
+		// }
+        function clearAliPay() {
+            $.ajax({
+                type:"post",
+                url:"/index.php/Admin/dataDock/clearAliPay",
+                dataType:"json",
+                success:function(data){
+                    if(data.code == 1){
+                        alert(data.info);
+                        window.location.reload()
+                    }else{
+                        alert(data.info);
+                        window.location.reload()
+                    }
+                }
+            });
+        }
+
+
+
+	</script>
+</block>

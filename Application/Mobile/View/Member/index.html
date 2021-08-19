@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="__PUBLIC__/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/swiper.min.css">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/member.css">
+
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="__PUBLIC__/js/jquery-3.1.0.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="__PUBLIC__/bootstrap/js/bootstrap.min.js"></script>
+
+    <title>会员中心</title>
+</head>
+
+<body class="index-bd">
+    <div class="ad-content">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <img src="__PUBLIC__/images/2.png" height="50">
+                </div>
+            </div>
+        </div>
+        <img src="__PUBLIC__/images/curve_top.png" class="curve-top">
+    </div>
+
+    <div class="member-center">
+        <eq name="is_user" value="1">
+        <div class="member-center-item">
+            <a href="#member-code" data-toggle="modal" onclick="my_qrcode()">
+                <img src="__PUBLIC__/images/member_code.png" class="img-icon">
+                <div>我的二维码{$test}</div>
+            </a>
+        </div>
+
+        <div class="member-center-item">
+            <a href="{:U('member/member_info')}">
+                <img src="__PUBLIC__/images/member_user.png" class="img-icon">
+                <div>个人信息</div>
+            </a>
+        </div>
+        <div class="member-center-item">
+            <a href="{:U('member/remainder')}">
+                <img src="__PUBLIC__/images/fund.png" class="img-icon">
+                <div>我的余额</div>
+            </a>
+        </div>
+        <else/>
+            <div class="member-center-item">
+                <img src="__PUBLIC__/images/member_user.png" class="img-icon">
+                <div>请从公众号进入登录</div>
+            </div>
+        </eq>
+    </div>
+
+    <div class="ad-content">
+        <img src="__PUBLIC__/images/curve_bottom.png" class="curve-bottom">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <img src="__PUBLIC__/images/2.png" height="50">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal code-modal" id="member-code1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="clearfix">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    </div>
+                    <div class="text-center" id="myQrcode"></div>
+                    <div class="text-center" style="margin-top:1rem;margin-bottom:1rem">会员余额支付</div>
+                    <div class="text-center" id="countdown" style="padding: 0.35rem;">50S</div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <script src="__PUBLIC__/js/swiper.jquery.min.js"></script>
+    <script>
+        var mySwiper = new Swiper('.swiper-container', {
+            autoplay: 5000,//可选选项，自动滑动
+        });
+        $('.swiper-container img').height(function(){
+            return $('.ad-content').height();
+        });  
+        function my_qrcode(){
+            $("#myQrcode").empty();
+            var str = '<img src="/index.php/mobile/member/vip_code" class="member-code">';
+            $("#myQrcode").append(str);
+            $("#member-code1").modal("show");
+            timer(30);
+        }
+        $("#countdown").click(function(){
+            my_qrcode();
+        });
+        function timer(time) {
+            var btn = $("#countdown");
+            btn.css("pointer-events","none");//按钮禁止点击
+            btn.css('border','')
+            btn.text(time <= 0 ? "刷新" : "" + (time)+"s");
+            var hander = setInterval(function() {
+                if (time <= 0) {
+                    clearInterval(hander); //清除倒计时
+                    btn.text("刷新");
+                    btn.css('border','1px solid rgb(0, 0, 0)')
+                    btn.css("pointer-events","initial")
+                    return false;
+                }else {
+                    btn.text("" + (time--)+"s");
+                }
+            }, 1000);
+        }
+        /* 打开连接事件 */
+        $("#worbutt").click(function() {
+            try {
+                var uid = {$uid};
+                ws = new WebSocket('ws://127.0.0.1:1234');
+                ws.onopen = function(){
+                    ws.send(uid);
+                    console.log("连接成功...");
+                };
+                ws.onmessage = function(e){
+                    // console.log(e.data);
+                    window.location.reload();
+                };
+                ws.onclose = function() {
+                    console.log("关闭连接...");
+                };
+            } catch(exception) {
+                console.log("有错误发生");
+            }
+        });
+
+        /* 发送数据事件 */
+        // $("button:eq(1)").click(function() {
+        //     /* 检查文本框是否为空 */
+        //     ws.send($("#data").val());
+        // });
+    </script>
+</body>
+
+</html>

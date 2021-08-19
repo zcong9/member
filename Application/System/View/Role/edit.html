@@ -1,0 +1,109 @@
+
+<include file="Public:base" />
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-horizontal mysubform" enctype="multipart/form-data" onsubmit="return false">
+                <div class="nav-tabs-custom">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab1">
+                            <input type="hidden" name="id" id="id" value="{$data.id|default=0}"/>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>角色名称</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="role_name" value="{$data.role_name}" placeholder="角色名称"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">角色描述</label>
+                                <div class="col-sm-7">
+                                    <textarea class="form-control" name="role_desc" id="role_desc" cols="20" rows="2">{$data.role_desc}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">权限详情</label>
+                                <div class="col-sm-7">
+                                    <volist name="actionList" id="vo">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="action_list[]" value="{$vo.id}" {$vo.checked} class="minimal">{$vo.action_name}
+                                    </label>
+                                    </volist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-7">
+                            <div class="btn-group pull-right">
+                                <button type="submit" class="btn btn-primary pull-right submits" id="mysubform">提交
+                                </button>
+                            </div>
+                            <div class="btn-group pull-left">
+                                <button type="reset" class="btn btn-warning">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(function(){
+
+        $("select[name='act_type']").change(function(){
+            var selectText = $(this).find('option:selected').text();
+            $("input[name='amount']").parent().prev().html('<b style="color: red;">*&nbsp;</b>优惠'+selectText);
+        });
+
+        $('.submits').click('click', function () {
+            $('.submits').attr('disabled','true');
+            var role_name = $('input[name="role_name"]').val();
+            var role_desc = $('#role_desc').text();
+            if(role_name){
+                let data = new FormData($('#mysubform').parents('form')[0]);
+                $.ajax({
+                    url: "",
+                    type: 'POST',
+                    data: data,
+                    dataType: 'Json',
+                    processData: false,   // jQuery不要去处理发送的数据
+                    contentType: false,   // jQuery不要去设置Content-Type请求头
+                    success: function (res) {
+                        if (res.status == 1) {
+                            layer.msg(res.info, {icon: 1, closeBtn: 1, shadeClose: true});
+                            setTimeout(function () {
+                                parent.layer.closeAll();
+                            }, 3000);
+                        } else {
+                            $('.submits').removeAttr('disabled');
+                            layer.msg(res.info, {icon: 5, closeBtn: 1, shadeClose: true});
+                        }
+                    }
+                });
+            }else{
+                layer.msg('带星的为必填');
+                $('.submits').removeAttr('disabled');
+            }
+            return false;
+        });
+    });
+
+    function onlyNumber (obj) {
+        //禁止录入整数部分两位以上，但首位为0
+        obj.value = obj.value.replace(/^([1-9]\d*(\.[\d]{0,2})?|0(\.[\d]{0,2})?)[\d.]*/g, '$1');
+        //先把非数字的都替换掉，除了数字和.
+        obj.value = obj.value.replace(/[^\d\.]/g, '');
+        //必须保证第一个为数字而不是.
+        obj.value = obj.value.replace(/^\./g, '0.');
+        //保证只有出现一个.而没有多个.
+        obj.value = obj.value.replace(/\.{2,}/g, '.');
+        //保证.只出现一次，而不能出现两次以上
+        obj.value = obj.value.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.');
+        //只能输入两个小数
+        obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
+        return obj.value;
+    }
+</script>

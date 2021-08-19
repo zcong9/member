@@ -1,0 +1,203 @@
+<extend name="Public:base" />
+<block name="main">
+    <section class="section">
+        <div class="section-header">{{langData.rechargeOrder[lang]}}</div>
+        <div class="section-content">
+            <form class="form-inline" method="get" action="">
+                <div class="form-group">
+                    <input type="text" name="keyword" value="{$Think.get.keyword}">
+                    <button class="blue-btn" type="submit">{{langData.search[lang]}}</button>
+                </div>
+            </form>
+            <div id="all">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>{{langData.orderNumber[lang]}}</th>
+                        <th>{{langData.compellation[lang]}}</th>
+                        <th>{{langData.rechargeAmount[lang]}}</th>
+                        <th>{{langData.giftAmount[lang]}}</th>
+                        <th>{{langData.datedAmount[lang]}}</th>
+                        <th>{{langData.orderTime[lang]}}</th>
+                        <th>{{langData.orderStatus[lang]}}</th>
+                        <th>{{langData.payTime[lang]}}</th>
+<!--                        <th>{{langData.operating[lang]}}</th>-->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <foreach name="lists" item="v">
+                        <tr>
+                            <td>{++$key}</td>
+                            <td>{$v['order_sn']}</td>
+                            <td>{$v['nickname']}</td>
+                            <td>{$v['total_amount']/100}元</td>
+                            <td>{$v['benefit']/100}元</td>
+                            <td>{$v['finall_benefit']/100}元</td>
+                            <td>{:date('Y-m-d H:i:s', $v['create_at'])}</td>
+                            <td><eq name="v.order_status" value="1">{{langData.unpaidok[lang]}}<else />{{langData.unpaid[lang]}}</eq></td>
+                            <td><empty name="v.pay_time">0<else />{:date('Y-m-d H:i:s', $v['pay_time'])}</empty></td>
+<!--                            <td>-->
+<!--                                <button class="edit-btn" data-toggle="modal" data-target="#storeModal" onclick="modify_vip({$v.id})"></button>-->
+<!--                                <button class="edit-btn" data-toggle="modal" data-target="#editmembers" data-vip_id="{$v['id']}" onclick="editInfo(this,{$now_page})"></button>-->
+<!--                            </td>-->
+                        </tr>
+                    </foreach>
+                    </tbody>
+                </table>
+                <div class="text-center">
+                    <ul class="pagination" id="detail-page">{$page}</ul>
+                </div>
+            </div>
+        </div>
+        <!-- /会员信息 -->
+    </section>
+
+    <div class="modal fade dishesClassifyModal" id="storeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 666px;">
+            <div class="modal-content">
+                <form id="add_restaurant" action="javascript:void(0)">
+                    <div class="modal-header">
+                        <button type="button" class="close-btn" data-dismiss="modal" aria-hidden="true" id="close_btn"></button>
+                        <h4 class="modal-title">{{langData.dishesCategorySettings[lang]}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="vip_id">
+                        <div class="modal-item">
+                            <span>{{langData.weixinHeadImgUrl[lang]}}:</span>
+                            <img src="" alt="" width="70" id="headimgurl">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.vipCardNum[lang]}}:</span>
+                            <input type="text" id="card_num" name="card_num" :placeholder="langData.vipCardNum[lang]" disabled="disabled">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.memberName[lang]}}:</span>
+                            <input type="text" id="username" name="username" :placeholder="langData.memberName[lang]">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.phoneNum[lang]}}:</span>
+                            <input type="text" id="phone" name="phone" :placeholder="langData.phoneNum[lang]">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.Gender[lang]}}:</span>
+                            <select name="sex" id="sex">
+                                <option value="0">--{{langData.Gender[lang]}}--</option>
+                                <option value="1">{{langData.male[lang]}}</option>
+                                <option value="2">{{langData.female[lang]}}</option>
+                            </select>
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.age[lang]}}:</span>
+                            <input type="text" id="age" name="age" :placeholder="langData.age[lang]">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.birthday[lang]}}:</span>
+                            <input type="text" id="birthday" name="birthday" :placeholder="langData.birthday[lang]">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.password[lang]}}:</span>
+                            <input type="text" id="password" name="password" :placeholder="langData.password[lang]">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.confirmPassword[lang]}}:</span>
+                            <input type="text" id="passwords" name="passwords" :placeholder="langData.confirmPassword[lang]">
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.balance[lang]}}:</span>
+                            <span id="remainder"></span>
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.totalConsumption[lang]}}:</span>
+                            <span id="total_consume"></span>
+                        </div>
+                        <div class="modal-item">
+                            <span>{{langData.AffiliatedShop[lang]}}:</span>
+                            <span id="restaurant_name"></span>
+                        </div>
+
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="blue-btn" data-dismiss="modal" onclick="commit_vip()">{{langData.save[lang]}}</button>
+                        <button type="button" class="blue-btn" data-dismiss="modal">{{langData.off[lang]}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="modal">
+    <!-- 编辑会员信息 -->
+    <div class="modal fade" id="editmembers">
+        <div class="modal-dialog">
+            <div class="modal-content" id="edit_vip">
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script>
+        //编辑前的填充
+        function modify_vip(i) {
+            $.ajax({
+                type: "get",
+                url: "/index.php/Agent/Memberlist/vip_info/id/" + i + "",
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    $("#headimgurl").attr('src', data.headimgurl);
+                    $("input[name='username']").val(data.username);
+                    $("select[name='sex'] option[value='"+(data.sex?data.sex:'')+"']").attr("selected", true);
+                    $("input[name='phone']").val(data.phone);
+                    $("#restaurant_name").text(data.restaurant_name);
+                    $("input[name='age']").val(data.age);
+                    $("input[name='birthday']").val(data.birthday);
+                    $("#remainder").text(data.remainder);
+                    $("#total_consume").text(data.total_consume);
+                    $("input[name='headimgurl']").val(data.headimgurl);
+                    $("input[name='card_num']").val(data.card_num);
+                    $("input[name='vip_id']").val(data.id);
+                }
+            });
+        }
+
+        //编辑店铺和新增店铺
+        function commit_vip(){
+            var username = $("input[name='username']").val();
+            var sex = $("#sex option:selected").val();
+            var phone = $("input[name='phone']").val();
+            var age = $("input[name='age']").val();
+            var birthday = $("input[name='birthday']").val();
+            var password = $("input[name='password']").val();
+            var passwords = $("input[name='passwords']").val();
+            var vip_id = $("input[name='vip_id']").val();
+            var p = parseInt($('.current').text());
+            if(p == 'NaN'){
+                p = 1;
+            }else{
+                p = parseInt($('.current').text());
+            }
+            if(username && sex && phone && age && birthday && vip_id){
+                $.ajax({
+                    type:"post",
+                    url:"/index.php/Agent/Memberlist/vip_post",
+                    async:true,
+                    data:{"username":username,"sex":sex,"phone":phone, "age":age,"birthday":birthday,"password":password,"passwords":passwords,"vip_id":vip_id},
+                    dataType:"json",
+                    success:function(data){
+                        if(data.code == 1){
+                            layer.msg(data.msg);
+                            $("#storeModal").modal("hide");
+                            self.location.href = "/index.php/admin/Memberlist/vip/page/"+p+".html";
+                        }
+                    },
+                    error:function(){
+                        layer.msg("出错了或帐号已存在！");
+                    }
+                });
+            }else{
+                layer.msg("所显示项不能为空！");
+            }
+        }
+    </script>
+</block>

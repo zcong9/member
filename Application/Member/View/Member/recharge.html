@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="__PUBLIC__/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/member.css?20180830">
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+  <![endif]-->
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="__PUBLIC__/js/jquery-3.1.0.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="__PUBLIC__/bootstrap/js/bootstrap.min.js"></script>
+    <script src="__PUBLIC__/layer/layer.js"></script>
+    <title>余额</title>
+</head>
+
+<body>
+    <header class="common-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-4 text-left">
+                    <a href="{:U('index')}" class="return">
+                        <img src="__PUBLIC__/images/lt.png">
+                    </a>
+                </div>
+                <div class="col-xs-4 text-center">
+                    我的余额
+                </div>
+                <div class="col-xs-4 text-right">
+                    <a href="{:U('bill')}">余额明细</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="fund-info">
+        <div>当前余额（元）</div>
+        <div class="fund-num">{$money}</div>
+    </div>
+    <div class="container-fluid fund-content">
+        <div class="fund-content-header text-center">余额充值</div>
+        <div class="row">
+        <eq name="if_open" value="1">
+            <foreach name="prepaid" item="v">
+                <div class="col-xs-6">
+                    <div class="fund-btn" onclick="return prepaid(this)">
+                        <input type="hidden" value="{$v['id']}" id="prepa_id">
+                        <span id="account">{$v['account']}</span><span>元</span>
+                        <eq name="is_p" value="2">
+                        <span class="red-ms-info">赠送{$v['benefit']}元</span>
+                        </eq>
+                    </div>
+                </div>
+            </foreach>
+        </eq>
+        </div>
+    </div>
+   <div class="fund-warn">
+        <input type="checkbox" value="off" id="read" checked="checked" onchange="select_read(this)">
+        <span>我已阅读并理解</span>
+        <a href="{:U('agreement')}">《充值服务协议》</a>
+    </div>
+    <script>
+    function select_read(obj) {
+        var value = $(obj).val();
+        if (value == "off") {
+            $(obj).val("on");
+        } else {
+            $(obj).val("off");
+        }
+    }
+
+    function prepaid(obj) {
+        $(".fund-btn").removeClass('active');
+        if ($("#read").val() == "on") {
+            layer.msg("请勾选“我已阅读并理解”");
+        } else {
+            $(obj).addClass('active');
+            var value = $(obj).find('#account').html();
+            var prepa_id = $(obj).find('#prepa_id').val();
+            var list = {};
+            list['account'] = value;
+            list['prepa_id'] = prepa_id;
+            $.ajax({
+                type: "post",
+                url: "{:U('order/create')}",
+                data: list,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 1) {
+                        var order_sn = data.data['order_sn'];
+                        var total_amount = data.data['total_amount'];
+                        self.location.href = "/index.php/member/pay/wxPrepaid/order_sn/" + order_sn + "/wx_prepaid_flag/weixin";
+                    }
+                },
+                error: function(data) {
+                    // console.log(data.responseText);
+                    layer.msg("there is a error!");
+                }
+            });
+        }
+    }
+    </script>
+</body>
+
+</html>

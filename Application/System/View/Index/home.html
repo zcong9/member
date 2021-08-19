@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>会员</title>
+</head>
+<body>
+	<div id="container" style="width:100%;height:400px"></div>
+</body>
+</html>
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="http://cdn.highcharts.com.cn/highcharts/9.1.2/highcharts.js"></script>
+<script src="http://cdn.highcharts.com.cn/highcharts/9.1.2/highcharts.js"></script>
+<script>
+$(function () {
+	$('#container').highcharts({
+		credits: {
+			enabled: false // 右下角不显示LOGO
+		},
+		title: {text: '会员'},
+		subtitle: {text: ''},
+		xAxis: {
+			categories: [{$day_str}]
+		},
+		yAxis: {
+			title: {text: ''}
+		},
+		tooltip: {
+			valueSuffix: '部'
+		},
+		plotOptions: {
+			line: {
+				dataLabels: {
+					enabled: true
+				},
+				enableMouseTracking: false
+			}
+		},
+		legend: {},
+		series: [{
+			name: '会员',
+			data: [{$user_str}]
+		}]
+	});
+});
+</script>

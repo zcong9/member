@@ -1,0 +1,12 @@
+.idea
+.project
+Runtime
+apk
+Public/Uploads
+*.txt
+Common/Conf/config.php
+Public/images
+Application/Admin/Uploads
+*.log
+.git
+Uploads

@@ -1,0 +1,47 @@
+<?php
+
+namespace Mobile\Model;
+
+use Think\Model;
+
+class FoodSpecificationModel extends Model
+{
+    private $model = NULL;
+
+    const TABLE_NAME = 'food_specification';
+
+    public function __construct($name = '', $tablePrefix = '', $connection = '')
+    {
+        parent::__construct($name, $tablePrefix, $connection);
+
+        $this->model = M(self::TABLE_NAME);
+    }
+
+    /**
+     * @param $food_restaurant_id
+     * @return bool
+     */
+    public function isHaveSpecification($food_restaurant_id)
+    {
+        return $this->model->where(['food_restaurant_id' => $food_restaurant_id])->find() ? true : false ;
+    }
+
+    /**
+     * @param $food_id
+     * @return array
+     */
+    public function getFoodSpecificationByFoodId($food_id)
+    {
+        if (empty($food_id) || !is_numeric($food_id)) return [];
+
+        $restaurant_id = (new FoodRestaurantModel())->getFoodRestaurantIdByFoodId($food_id);
+
+        if (empty($restaurant_id)) return [];
+
+        return $this->model->alias('fs')
+            ->field('fs.specification_img,fs.name,fs.food_specification_id,fs.select,fs.specification_desc,fst.type_img,fst.food_type_name,fst.plus_price,fst.food_type_id')
+            ->join('food_specification_middle fsm ON fs.food_specification_id=fsm.food_specification_id')
+            ->join('food_specification_type fst ON fsm.food_type_id=fst.food_type_id')
+            ->where('fs.food_restaurant_id IN (' . $restaurant_id . ')')->select();
+    }
+}

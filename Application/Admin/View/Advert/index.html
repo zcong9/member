@@ -1,0 +1,248 @@
+<extend name="Public:base" />
+<style>
+
+</style>
+<block name="main">
+    <section class="section">
+        <div class="section-header">广告列表</div>
+        <div class="section-content">
+        <button class="btn btn-primary btn-sm" onclick="addAdvert()">+{{langData.NewlyAdded[lang]}}</button>
+            <form class="form-inline" method="get" action="?">
+                <div class="form-group">
+                    <!-- <input type="text" name="keyword" value="{$Think.get.keyword}"> -->
+                    <!-- <button class="blue-btn" type="submit">{{langData.search[lang]}}</button> -->
+                </div>
+            </form>
+            <div id="all">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>广告详情</th>
+                        <th>广告图</th>
+                        <th>广告位置</th>
+                        <th>状态</th>
+                        <th>{{langData.operating[lang]}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <foreach name="lists" item="v">
+                        <tr>
+                            <td>{$v.advertisement_id}</td>
+                            <td>{$v['advertisement_desc']}</td>
+                            <td><img src="{$v['advertisement_image_url']}" alt="" width="50"></td>
+                            <td><eq name="v.advertisement_type" value="1">底部<else />顶部</eq></td>
+                            <td><eq name="v.status" value="1">开启<else />关闭</eq></td>
+                            <td>
+                                <button class="edit-btn" data-toggle="modal" data-target="#storeModal" onclick="editAdvert({$v.advertisement_id})"></button>
+                                <button class="remove-btn" onclick="delInfo({$v.advertisement_id})"></button>
+                            </td>
+                        </tr>
+                    </foreach>
+                    </tbody>
+                </table>
+                <div class="text-center">
+                    <ul class="pagination" id="detail-page">{$page}</ul>
+                </div>
+            </div>
+        </div>
+        <!-- /会员信息 -->
+    </section>
+
+    <div class="modal fade dishesClassifyModal" id="storeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 666px;">
+            <div class="modal-content">
+                <form id="add_restaurant" action="javascript:void(0)">
+                    <div class="modal-header">
+                        <button type="button" class="close-btn" data-dismiss="modal" aria-hidden="true" id="close_btn"></button>
+                        <h4 class="modal-title">店铺信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="advertisement_id">
+                        <div class="modal-item">
+                            <span>图片:</span>
+                            <img src="__PUBLIC__/images/log1.jpg" alt="" id="bcd" width="100">
+                        </div>
+                        <div class="modal-item">
+                            <span>选择图片:</span>
+                            <input type="file" name="img_url" id="abc" style="width: 220px;height: 24px;border: 1px solid #d3d3d3;padding-left: 4px;font-size: 12px;outline: none;display:initial;position:inherit;opacity:1">
+                        </div>
+                        <div class="modal-item">
+                            <span>广告描述:</span>
+                            <input type="text" id="advertisement_desc" name="advertisement_desc">
+                        </div>
+                        <div class="modal-item">
+                            <span>广告位置:</span>
+                            <select name="advertisement_type" id="advertisement_type">
+                                <option value="0">顶部</option>
+                                <option value="1">底部</option>
+                            </select>
+                        </div>
+                        <div class="modal-item">
+                            <span>状态:</span>
+                            <select name="status" id="status">
+                                <option value="0">关闭</option>
+                                <option value="1">启动</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="blue-btn" data-dismiss="modal" id="submitButton" onclick="checkForms();">{{langData.save[lang]}}</button>
+                        <button type="button" class="blue-btn" data-dismiss="modal">{{langData.off[lang]}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="modal">
+    <!-- 编辑会员信息 -->
+    <div class="modal fade" id="editmembers">
+        <div class="modal-dialog">
+            <div class="modal-content" id="edit_vip">
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script>
+    $(function() {
+        $("#abc").change(function(e) {
+            var imgBox = e.target;
+            uploadImg($('#bcd'), imgBox)
+        });
+
+        function uploadImg(element, tag) {
+            var file = tag.files[0];
+            var imgSrc;
+            if (!/image\/\w+/.test(file.type)) {
+                alert("看清楚，这个需要图片！");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function() {
+                imgSrc = this.result;
+                element.attr("src", imgSrc);
+            };
+        }
+    })
+
+        //点击新增显示省
+        function addAdvert() {
+            $("input[name='store_id']").attr("value", 0);
+            $("input[name='store_name']").val('');
+            $("select[name='status'] option[value='0']").attr("selected", true);
+            $("input[name='store_addr']").val('');
+            $("#bcd").attr('src', '');
+            $("#storeModal").modal("show");
+        }
+
+
+        // 编辑前的填充
+        function editAdvert(i) {
+            $.ajax({
+                type: "get",
+                url: "{:U('edit')}",
+                data: {'id':i},
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    $("input[name='advertisement_desc']").val(data.advertisement_desc);
+                    $("select[name='advertisement_type'] option[value='"+(data.advertisement_type?data.advertisement_type:'')+"']").attr("selected", true);
+                    $("select[name='status'] option[value='"+(data.status?data.status:'')+"']").attr("selected", true);
+                    $("#bcd").attr('src', data.advertisement_image_url);
+                    $("input[name='advertisement_id']").val(data.advertisement_id);
+                }
+            });
+        }
+
+        function delInfo(id) {
+            layer.confirm('是否确认删除广告？', {
+                btn: ['确认','取消'] //按钮
+            }, function(){
+                $.ajax({
+                    url: "{:U('delInfo')}",
+                    type: "post",
+                    data: { "id": id},
+                    dataType:"json",
+                    success: function(data) {
+                        layer.msg('删除成功', {time: 1000} , function(){
+                            window.location.reload();
+                        });
+                    },
+                    error: function() {
+                        console.log("访问出错");
+                    }
+                });
+            });
+        }
+
+        /**
+         * 表单提交
+         * @returns {boolean}
+         */
+        let checkForms = function () {
+            var p = parseInt($('.current').text());
+            if(p == 'NaN'){
+                p = 1;
+            }else{
+                p = parseInt($('.current').text());
+            }
+            var index = layer.load(2, {shade: false});
+            let data = new FormData($('#submitButton').parents('form')[0]);
+            $.ajax({
+                url: "{:U('addqrUpload')}",
+                type: 'POST',
+                data: data,
+                dataType: 'Json',
+                processData: false,   // jQuery不要去处理发送的数据
+                contentType: false,   // jQuery不要去设置Content-Type请求头
+                success: function (res) {
+                    layer.msg(res.info,{anim: 2,time: 1500},function () {
+                        if(res.status != 0){
+                            window.location.href="/index.php/Admin/Advert/index/page/"+p+".html";;
+                        }
+                    });
+                    layer.close(index);
+                }
+            });
+            return false;
+        }
+
+        //编辑店铺和新增店铺
+        // function commit_vip(){
+        //     var store_name = $("input[name='store_name']").val();
+        //     var status = $("#status option:selected").val();
+        //     var store_addr = $("input[name='store_addr']").val();
+        //     var store_id = $("input[name='store_id']").val();
+        //     var p = parseInt($('.current').text());
+        //     if(p == 'NaN'){
+        //         p = 1;
+        //     }else{
+        //         p = parseInt($('.current').text());
+        //     }
+        //     if(store_name && store_addr && store_id){
+        //         $.ajax({
+        //             type:"post",
+        //             url:"/index.php/Admin/RestaurantSetting/store_post",
+        //             async:true,
+        //             data:{"store_name":store_name,"status":status,"store_addr":store_addr, "store_id":store_id},
+        //             dataType:"json",
+        //             success:function(data){
+        //                 if(data.code == 1){
+        //                     layer.msg(data.msg);
+        //                     $("#storeModal").modal("hide");
+        //                     self.location.href = "/index.php/Admin/RestaurantSetting/index/page/"+p+".html";
+        //                 }
+        //             },
+        //             error:function(){
+        //                 layer.msg("出错了或帐号已存在！");
+        //             }
+        //         });
+        //     }else{
+        //         layer.msg("所显示项不能为空！");
+        //     }
+        // }
+    </script>
+</block>

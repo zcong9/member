@@ -1,0 +1,189 @@
+
+<include file="Public:base" />
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-horizontal mysubform" enctype="multipart/form-data" onsubmit="return false">
+                <div class="nav-tabs-custom">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab1">
+                            <input type="hidden" name="merchant_id" id="merchant_id" value="{$data.merchant_id|default=0}"/>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>商户名称</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="merchant_name" value="{$data.merchant_name}" placeholder="商户名称"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">商铺别名</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="alias_name" value="{$data.alias_name}" placeholder="商铺别名"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>联系人</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="contact_name" value="{$data.contact_name}" placeholder="联系人"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>联系电话</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="contact_phone" value="{$data.contact_phone}" placeholder="联系电话"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">邮箱</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="contact_email" value="{$data.contact_email}" placeholder="邮箱"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>地址</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="address" value="{$data.address}" placeholder="  地址"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">状态</label>
+                                <div class="col-sm-7">
+                                    <label class="checkbox-inline">
+                                        <input type="radio" name="status" value="1"
+                                        <if condition="$data.status eq 1">checked="checked"</if>
+                                        class="minimal"> 启用
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="radio" name="status" value="0"
+                                        <if condition="$data.status eq 0">checked="checked"</if>
+                                        class="minimal"> 禁用
+                                    </label>
+                                </div>
+                            </div>
+                            <empty name="data">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>登录账号</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="account" value="{$data.account}" placeholder="  登录账号"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>管理员名称</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="real_name" value="{$data.real_name}" placeholder="  管理员名称"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>登录密码</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="pwd" value="{$data.pwd}" placeholder="  登录密码"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>确认密码</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="text" name="pwd_word" value="{$data.pwd_word}" placeholder="  确认密码"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>管理员角色</label>
+                                <div class="col-sm-7">
+                                    <select name="role_id" id="role_id" class="form-control">
+                                        <option <if condition="$data.role_id eq 1">selected="selected"</if> value="1">角色1</option>
+                                        <option <if condition="$data.role_id eq 2">selected="selected"</if> value="2">角色2</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            </empty>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-7">
+                            <div class="btn-group pull-right">
+                                <button type="submit" class="btn btn-primary pull-right submits" id="mysubform">提交
+                                </button>
+                            </div>
+                            <div class="btn-group pull-left">
+                                <button type="reset" class="btn btn-warning">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(function(){
+
+        $("select[name='act_type']").change(function(){
+            var selectText = $(this).find('option:selected').text();
+            $("input[name='amount']").parent().prev().html('<b style="color: red;">*&nbsp;</b>优惠'+selectText);
+        });
+
+        $('.submits').click('click', function () {
+            $('.submits').attr('disabled','true');
+            var merchant_name = $('input[name="merchant_name"]').val();
+            var contact_name = $('input[name="contact_name"]').val();
+            var contact_phone = $('input[name="contact_phone"]').val();
+            var address = $('input[name="address"]').val();
+            var status = $('input[name="status"]:checked').val();
+            var account = $('input[name="account"]').val();
+            var real_name = $('input[name="real_name"]').val();
+            var pwd = $('input[name="pwd"]').val();
+            var pwd_word = $('input[name="pwd_word"]').val();
+            var role_id = $('#role_id option:selected').val();
+            if(merchant_name && contact_name && contact_phone && address && account && real_name && pwd && pwd_word && role_id){
+                let data = new FormData($('#mysubform').parents('form')[0]);
+                $.ajax({
+                    url: "",
+                    type: 'POST',
+                    data: data,
+                    dataType: 'Json',
+                    processData: false,   // jQuery不要去处理发送的数据
+                    contentType: false,   // jQuery不要去设置Content-Type请求头
+                    success: function (res) {
+                        if (res.status == 1) {
+                            layer.msg(res.info, {icon: 1, closeBtn: 1, shadeClose: true});
+                            setTimeout(function () {
+                                parent.layer.closeAll();
+                            }, 3000);
+                        } else {
+                            $('.submits').removeAttr('disabled');
+                            layer.msg(res.info, {icon: 5, closeBtn: 1, shadeClose: true});
+                        }
+                    }
+                });
+            }else{
+                layer.msg('带星的为必填');
+                $('.submits').removeAttr('disabled');
+            }
+            return false;
+        });
+    });
+
+    function onlyNumber (obj) {
+        //禁止录入整数部分两位以上，但首位为0
+        obj.value = obj.value.replace(/^([1-9]\d*(\.[\d]{0,2})?|0(\.[\d]{0,2})?)[\d.]*/g, '$1');
+        //先把非数字的都替换掉，除了数字和.
+        obj.value = obj.value.replace(/[^\d\.]/g, '');
+        //必须保证第一个为数字而不是.
+        obj.value = obj.value.replace(/^\./g, '0.');
+        //保证只有出现一个.而没有多个.
+        obj.value = obj.value.replace(/\.{2,}/g, '.');
+        //保证.只出现一次，而不能出现两次以上
+        obj.value = obj.value.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.');
+        //只能输入两个小数
+        obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
+        return obj.value;
+    }
+</script>

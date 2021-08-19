@@ -1,0 +1,89 @@
+<!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="nav-close"><i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                        <span><img alt="image" class="img-circle" src="__PUBLIC__/images/member_user.png" /></span>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear">
+	                           	<span class="block m-t-xs"><strong class="font-bold">{$Think.session.account}</strong></span>
+	                            <!--<span class="text-muted text-xs block">超级管理员<b class="caret"></b></span>-->
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <!--<li><a class="J_menuItem" href="#">修改头像</a>
+                            </li>
+                            <li><a class="J_menuItem" href="#">个人资料</a>
+                            </li>
+                            <li><a class="J_menuItem" href="#">联系我们</a>
+                            </li>
+                            <li><a class="J_menuItem" href="#">信箱</a>
+                            </li>-->
+                            <li class="divider"></li>
+                            <li><a href="{:U('System/Login/logout')}">安全退出</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="logo-element">Admin</div>
+                </li>
+
+                <li class="treeview"><a href="javascript:void(0);"><i class=""></i><span>商户管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('merchant/index')}"><i class=""></i>商户列表</a></li>
+                    </ul>
+                    <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('MerchantManager/index')}"><i class=""></i>商户管理员</a></li>
+                    </ul>
+                </li>
+
+                <li class="treeview"><a href="javascript:void(0);"><i class=""></i><span>门店管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('store/index')}"><i class=""></i>门店列表</a></li>
+                    </ul>
+                    <!-- <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href=""><i class=""></i>店员列表</a></li>
+                    </ul> -->
+                </li>
+
+                <li class="treeview"><a href="javascript:void(0);"><i class=""></i><span>会员管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('Members/index')}"><i class=""></i>会员列表</a></li>
+                    </ul>
+                </li>
+
+                <li class="treeview"><a href="javascript:void(0);"><i class=""></i><span>系统管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('Action/index')}"><i class=""></i>权限设置</a></li>
+                    </ul>
+                    <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('Role/index')}"><i class=""></i>角色配置</a></li>
+                    </ul>
+                    <!-- <ul class="nav nav-second-level">
+                        <li><a class="J_menuItem" href="{:U('Members/index')}"><i class=""></i>系统管理员</a></li>
+                    </ul> -->
+                </li>
+
+                <?php 
+                	foreach($treeMenu as $k => $v){
+                		if ($v['level'] == 1 && $v['name'] == 'Index/index') {
+                			echo '<li><a href="'.U($v['name']).'"><i class="'.$v['icon'].'"></i><span>'.$v['title'].'</span></a></li>';
+                		} elseif ($v['level'] == 1) {
+                			echo '<li class="treeview"><a href="javascript:void(0);"><i class="'.$v['icon'].'"></i><span>'.$v['title'].'</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>';
+                			echo '<ul class="nav nav-second-level">';
+                			foreach ($treeMenu as $kk => $vv) {
+                				if ($vv['pid'] == $v['id']) {
+                					echo '<li><a class="J_menuItem" href="'.U($vv['name']).'"><i class="'.$vv['icon'].'"></i>'.$vv['title'].'</a></li>';
+                				}
+                			}
+                			echo '</ul></li>';
+                		}
+                	}	
+                ?>
+
+            </ul>
+        </div>
+    </nav>
+    <!--左侧导航结束-->

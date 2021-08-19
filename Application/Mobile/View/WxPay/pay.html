@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <title>微信安全支付</title>
+    <script type="text/javascript">
+        //调用微信JS api 支付
+        function jsApiCall()
+        {
+            WeixinJSBridge.invoke(
+                'getBrandWCPayRequest',
+                {$jsApiParameters},
+                function(res){
+                    // alert(res.err_code+res.err_desc+res.err_msg);
+                    if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                        window.location.href = "/index.php/mobile/Member/index";
+                    } else if(res.err_msg == "get_brand_wcpay_request:fail" ) {  //支付失败
+                        window.location.href = "/index.php/mobile/Member/index";
+                    }
+                }
+            );
+        }
+        //function callpay()
+        window.onload = function ()
+        {
+            if (typeof WeixinJSBridge == "undefined"){
+                if( document.addEventListener ){
+                    document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+                }else if (document.attachEvent){
+                    document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                    document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+                }
+            }else{
+                jsApiCall();
+            }
+        }
+    </script>
+</head>
+<body>
+<?php if(!strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger')){?>
+<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_info weui_icon_msg"></i></div><div class="weui_text_area"><h4 class="weui_msg_title">请在微信客户端打开链接</h4></div></div>
+<?php }?>
+<input type="hidden" value="{$Think.session.restaurant_id}" name="restaurant_id" id="restaurant_id">
+<input type="hidden" value="{$Think.session.desk_code}" name="desk_code" id="desk_code">
+<input type="hidden" value="{$order_sn}" name="order_sn" id="order_sn">
+</body>
+</html>

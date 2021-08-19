@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <!-- Bootstrap 核心 CSS 文件 -->
+        <link rel="stylesheet" href="__PUBLIC__/bootstrap/css/bootstrap.min.css"/>
+        <!-- 自定义css样式表 -->
+        <block name="css"></block>
+        <!-- admin CSS 文件 -->
+        <link rel="stylesheet" href="__PUBLIC__/css/base.css?v=20180125"/>
+        <link rel="stylesheet" href="__PUBLIC__/css/admin.css?v=20180228"/>
+        <title>
+            会员管理
+        </title>
+    </head>
+    <body class="index-body">
+        <div id="lang-content" class="h100" v-cloak>
+            <header class="admin-header">
+                <div class="admin-header-content clearfix">
+                    <!--<img class="header-logo" src="{$logo}">-->
+                    <!--<img class="header-logo" src="{$Restaurant['logo']}">-->
+                    <if condition="$logo != ''">
+                    	<img class="header-logo" src="{$logo}"/>
+                    	<else />
+                    	<img class="header-logo" src="__PUBLIC__/images/member_user.png">
+                    </if>
+                    <span class="header-title">
+                        {{ langData.headerTitle[lang] }}
+                    </span>
+                    <div class="pull-right header-user flex-content">
+                        <div id="account" class="header-user-name flex-main">
+                            <div>
+                                {$Think.session.login_account}
+                            </div>
+                            <div>
+                                <?php echo $_SESSION['restaurant_name'];?>
+                            </div>
+                        </div>
+                        <button class="header-logout" onclick="loginout()">
+                            {{ langData.signOut[lang] }}
+                        </button>
+                        <div class="dropdown">
+                            <button type="button" class="dropdown-toggle" data-toggle="dropdown">
+                                {{ langData.language[lang] }}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a onclick="setCookie('zh-CN')">
+                                        中文简体
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="setCookie('zh-TW')">
+                                        中文繁體
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="setCookie('en')">
+                                        English
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="main">
+                <!-- 左侧导航栏 -->
+                <aside class="sidebar">
+                    <ul class="sidebar-menu">
+                        <li class="treeview">
+                            <if condition="in_array('Admin/Restaurant/all',$url)">
+                            <div class="treeview-header treeview-item" data-auth="a_0">
+                                <img src="__PUBLIC__/images/store.png"/>
+                                <span>
+                                    {{ langData.shopSet[lang] }}
+                                </span>
+                            </div>
+
+                            <ul class="treeview-menu">
+                                <if condition="in_array('Admin/RestaurantSetting/index',$url)">
+                                    <li class="treeview-item active" data-auth="a_1">
+                                        <a target='rightFrame' href="{:U('RestaurantSetting/index')}" >
+                                            {{ langData.shopInfo[lang] }}
+                                        </a>
+                                    </li>
+                                </if>
+                                <if condition="in_array('Admin/RestaurantSetting/dataForPay',$url)">
+                                <li class="treeview-item" data-auth="a_4">
+                                    <a target='rightFrame' href="{:U('RestaurantSetting/dataForPay')}">
+                                        {{ langData.paymentSet[lang] }}
+                                    </a>
+                                </li>
+                                </if>
+                                <if condition="in_array('Admin/Advert/index',$url)">
+                                <li class="treeview-item" data-auth="a_4">
+                                    <a target='rightFrame' href="{:U('Advert/index')}">
+                                        {{ langData.memberAdvertising[lang] }}
+                                    </a>
+                                </li>
+                                </if>
+                            </ul>
+                         </if>
+
+                        </li>
+                        <if condition="in_array('Admin/Memberlist/index',$url)">
+                        <li class="treeview">
+                            <div class="treeview-header treeview-item" data-auth="a_0">
+                                <img src="__PUBLIC__/images/store.png"/>
+                                <span>{{langData.memberCentre[lang]}}</span>
+                            </div>
+                            <ul class="treeview-menu">
+                                <if condition="in_array('Admin/Memberlist/index',$url)">
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/vip')}">{{langData.memberInfo[lang]}}</a>
+                                </li>
+                                </if>
+                                <if condition="in_array('Admin/Memberlist/prepaidOrder',$url)">
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/prepaidOrder')}">{{langData.rechargeOrder[lang]}}</a>
+                                </li>
+                                </if>
+                                <if condition="in_array('Admin/Memberlist/prepaid',$url)">
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/prepaid')}">{{langData.preRecharge[lang]}}</a>
+                                </li>
+                                </if>
+                                <if condition="in_array('Admin/Memberlist/weixinAccounts',$url)">
+                                <li class="treeview-item" data-auth="a_7">
+                                    <a target='rightFrame' href="{:U('Memberlist/weixinAccounts')}">公众号设置</a>
+                                </li>
+                                </if>
+                            </ul>
+                        </li>
+                        </if>
+                        <!--<if condition="$likeOpen == 1">-->
+                            <!--<li class="treeview">-->
+                                <!--<div class="treeview-header treeview-item" data-auth="l_0">-->
+                                    <!--<img src="__PUBLIC__/images/store.png"/>-->
+                                    <!--<span>-->
+                                      <!--{{langData.LikeFunction[lang]}}-->
+                                    <!--</span>-->
+                                <!--</div>-->
+                                <!--<ul class="treeview-menu">-->
+                                    <!--<li class="treeview-item active" data-auth="l_1">-->
+                                        <!--<a target='rightFrame' href="{:U('Menu/menu')}">-->
+                                            <!--{{langData.dishesSet[lang]}}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                    <!--<li class="treeview-item" data-auth="l_2">-->
+                                        <!--<a target='rightFrame' href="{:U('Like/likeCount')}">-->
+                                            <!--{{langData.LikeStatistics[lang]}}-->
+                                        <!--</a>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                        <!--</if>-->
+                    </ul>
+                </aside>
+                <iframe src="{:U('RestaurantSetting/index')}" class="main-iframe" id="rightFrame" name="rightFrame"></iframe>
+            </div>
+        </div>
+        <script src="__PUBLIC__/js/vue.js"></script>
+        <script src="__PUBLIC__/language.json?v=20210622"></script>
+        <script src="__PUBLIC__/js/jquery-3.1.0.min.js"></script>
+        <script src="__PUBLIC__/bootstrap/js/bootstrap.min.js"></script>
+        <script src="__PUBLIC__/layer/layer.js"></script>
+        <script src="__PUBLIC__/js/Admin/common.js"></script>
+        <script type="text/javascript">
+        var vm = new Vue({
+            el: "#lang-content",
+            data: {
+                lang: language,
+                langData: langData
+            }
+        })
+
+        function submit_form() {
+            var password = $("input[name='password']").val();
+            var passwords = $("input[name='passwords']").val();
+            if (password === passwords) {
+                var form = $("#restaurant_form")[0];
+                var formData = new FormData(form);
+                $.ajax({
+                    //1
+                    url: "/index.php/admin/restaurant/index",
+                    data: formData,
+                    dataType: 'json',
+                    type: 'post',
+                    //          async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(msg) {
+                        if (msg.code == 1) {
+                            layer.msg(vm.langData.success[vm.lang]);
+                        } else {
+                            layer.msg(vm.langData.failed[vm.lang]);
+                        }
+                    },
+                    error: function() {
+                        layer.msg(vm.langData.networkError[vm.lang]);
+                    }
+                });
+            } else {
+                layer.msg(vm.langData.psdMatch[vm.lang]);
+            }
+        }
+        </script>
+
+        <script>
+            var auth = '{$permission}';
+
+            $(".treeview-item").each(function(){
+                if(auth.is_main == 1){
+                    if(auth.permission.indexOf($(this).attr("data-auth"))<0){
+                        $(this).remove();
+                    }
+                }
+            })
+
+        </script>
+    </body>
+</html>

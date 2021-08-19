@@ -1,0 +1,40 @@
+<table class="agent-table table-hover">
+	<thead>
+	<tr class="text-center">
+		<td>{{langData.SerialNumber[lang]}}</td>
+		<td>{{langData.shopName[lang]}}</td>
+		<td>{{langData.ShopArea[lang]}}</td>
+		<td>{{langData.DetailedAddressStore[lang]}}</td>
+		<td>{{langData.StoreManager[lang]}}</td>
+		<td>{{langData.TakeOutPhone1[lang]}}</td>
+		<td>{{langData.TakeOutPhone2[lang]}}</td>
+		<td>{{langData.operating[lang]}}</td>
+	</tr>
+	</thead>
+	<tbody>
+	<volist name="Arrlist2" id="vo">
+		<tr>
+			<td>{$i}</td>
+			<td>{$vo.restaurant_name}</td>
+			<td>{$vo.city3_name}</td>
+			<td>
+				<span  class="store-address">
+					{$vo.address}
+				</span>
+			</td>
+			<td>{$vo.login_account}</td>
+			<td>{$vo.telephone1}</td>
+			<td>{$vo.telephone2}</td>
+			<td>
+				<button class="btn btn-black" data-toggle="modal" data-target="#storeModal" onclick="modify_store({$vo.restaurant_id})">{{langData.edit[lang]}}</button>
+				<button class="btn btn-default" onclick="delstore({$vo.restaurant_id})">{{langData.delete[lang]}}</button>
+			</td>
+		</tr>
+	</volist>
+	</tbody>
+</table>
+<div>
+	<ul class="pagination" id="detail-page">
+		{$page}
+	</ul>
+</div>
