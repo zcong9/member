@@ -127,7 +127,6 @@ class MemberController extends Controller
         $condition['type'] = 1;
         $condition['merchant_id'] = MCH_ID;
         $prepaid = D("all_benefit") -> where($condition) -> order("account asc") -> field("id,account,benefit") -> select();
-        
         $this -> assign('is_p', 2);
         $this -> assign("prepaid", $prepaid);
         $this -> display();

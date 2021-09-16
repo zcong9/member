@@ -1,0 +1,62 @@
+<style>
+	.table th, .table td {
+		text-align: center;
+		vertical-align: middle!important;
+	}
+</style>
+<table id="tableList" class="table table-hover">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>商户名称</th>
+    <th>微信昵称</th>
+    <th>类型</th>
+    <th>变动金额</th>
+    <th>变动前金额</th>
+    <th>变动后金额</th>
+    <th>明细</th>
+    <th>时间</th>
+</tr>
+</thead>
+<tbody>
+<volist name="lists" id="vo">
+    <tr id="trid{$vo.id}">
+        <td>{$vo.id}</td>
+        <td>{$vo.merchant_name}</td>
+        <td>{$vo.nickname}</td>
+        <td>
+            <eq name="vo.change_type" value="1">充值</eq>
+            <!-- <eq name="vo.change_type" value="1">充值退款</eq> -->
+            <eq name="vo.change_type" value="2">订单消费</eq>
+            <eq name="vo.change_type" value="3">订单退款</eq>
+            <eq name="vo.change_type" value="4">转账</eq>
+            <eq name="vo.change_type" value="6">手动调整增加</eq>
+            <eq name="vo.change_type" value="7">减少</eq>
+        </td>
+        <td>{$vo['amount'] / 100}元</td>
+        <td>{$vo['before_change_amount'] / 100}元</td>
+        <td>{$vo['after_change_amount'] / 100}元</td>
+        <td>{$vo.desc}</td>
+        <td>{$vo.create_at|date="Y-m-d H:i:s",###}</td>
+    </tr>
+</volist>
+</tbody>
+</table>
+<div>
+<ul class="pagination" id="detail-page">
+    {$page}
+</ul>
+</div>
+<block name="js">
+	<script>
+        $(".pagination  a").click(function () {
+            var page = $(this).data('page');
+            ajax_get_table('search-form2', page);
+            return false;
+        });
+
+        $('.minimal').change(function(){
+            $("input[name='id[]']:checkbox").prop('checked',$(this).is(':checked')?true:false);
+        });
+	</script>
+</block>

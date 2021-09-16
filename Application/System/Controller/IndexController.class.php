@@ -20,8 +20,9 @@ class IndexController extends BaseController {
 	
 	public function home(){
         // 月份天数
-        // $tmpDay = '2021-06';
-        $days = date('t', strtotime());
+        $startDate = I('get.startDate');
+        $tmpDay = !empty($startDate) ? $startDate: date('Y-m');
+        $days = date('t', strtotime($tmpDay));
         $membersModel = new MembersModel();
         for($i = 1; $i<= $days; $i++){
             $day_data[] = $i;
@@ -35,6 +36,7 @@ class IndexController extends BaseController {
 
         $user_str = implode(',', $user_data);
         $this->assign('user_str', $user_str);
+        $this->assign('tmpDay', $tmpDay);
         return $this->display();
 	}
 }

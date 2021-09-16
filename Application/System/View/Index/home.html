@@ -5,14 +5,40 @@
 	<title>会员</title>
 </head>
 <body>
+<form action="">
+	<div style="display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;">
+		<span>日期：</span>
+		<input class="selectIcon" type="text" id="demoTest" name="startDate" value="{$tmpDay}" readonly style="display: inline-block;
+    width: auto;
+    vertical-align: middle;height: 24px;
+    border: 1px solid #d3d3d3;
+    padding-left: 4px;
+    font-size: 12px;
+    outline: none;">
+	</div>
+	<button type="submit" style="padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;">搜索</button>
 	<div id="container" style="width:100%;height:400px"></div>
+</form>
 </body>
 </html>
 <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
 <script src="http://cdn.highcharts.com.cn/highcharts/9.1.2/highcharts.js"></script>
 <script src="http://cdn.highcharts.com.cn/highcharts/9.1.2/highcharts.js"></script>
+<script src="__STATIC__/js/laydate/laydate.js"></script>
 <script>
 $(function () {
+	//年月选择器
+	laydate.render({
+	  elem: '#demoTest'
+	  ,type: 'month'
+	});
 	$('#container').highcharts({
 		credits: {
 			enabled: false // 右下角不显示LOGO

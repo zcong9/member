@@ -94,6 +94,8 @@ class MerchantController extends BaseController {
                 $this->error('添加失败');
             }
         }
+        $rolelist = D('role')->field('id, role_name')->select();
+        $this->assign('rolelist', $rolelist);
         $this->display('edit');
     }
 

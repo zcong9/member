@@ -96,8 +96,10 @@
                                 <label class="col-sm-2 control-label"><b style="color: red;">*&nbsp;</b>管理员角色</label>
                                 <div class="col-sm-7">
                                     <select name="role_id" id="role_id" class="form-control">
-                                        <option <if condition="$data.role_id eq 1">selected="selected"</if> value="1">角色1</option>
-                                        <option <if condition="$data.role_id eq 2">selected="selected"</if> value="2">角色2</option>
+                                        <option value="0">请选择</option>
+                                        <volist name="rolelist" id="vr">
+                                        <option <eq name="vr.id" value="$data.role_id">selected="selected"</eq> value="{$vr.id}">{$vr.role_name}</option>
+                                        </volist>
                                     </select>
                                 </div>
                             </div> 
@@ -137,12 +139,13 @@
             var contact_phone = $('input[name="contact_phone"]').val();
             var address = $('input[name="address"]').val();
             var status = $('input[name="status"]:checked').val();
-            var account = $('input[name="account"]').val();
-            var real_name = $('input[name="real_name"]').val();
-            var pwd = $('input[name="pwd"]').val();
-            var pwd_word = $('input[name="pwd_word"]').val();
-            var role_id = $('#role_id option:selected').val();
-            if(merchant_name && contact_name && contact_phone && address && account && real_name && pwd && pwd_word && role_id){
+
+            // var account = $('input[name="account"]').val();
+            // var real_name = $('input[name="real_name"]').val();
+            // var pwd = $('input[name="pwd"]').val();
+            // var pwd_word = $('input[name="pwd_word"]').val();
+            // var role_id = $('#role_id option:selected').val();
+            if(merchant_name && contact_name && contact_phone && address){
                 let data = new FormData($('#mysubform').parents('form')[0]);
                 $.ajax({
                     url: "",
